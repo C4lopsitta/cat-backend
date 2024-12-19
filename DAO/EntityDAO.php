@@ -1,6 +1,6 @@
 <?php
-include_once("GenericDAO.php");
-include_once("Entity.php");
+include_once("DAO/GenericDAO.php");
+include_once("Model/Entity.php");
 
 class EntityDAO extends GenericDAO {
 
@@ -68,4 +68,4 @@ class EntityDAO extends GenericDAO {
         return $entities;
     }
 }
-?>
+
