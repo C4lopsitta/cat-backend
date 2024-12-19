@@ -1,6 +1,6 @@
 <?php
-	include_once("GenericREST.php");
-	include_once("EntityDAO.php");
+	include_once("REST/GenericREST.php");
+	include_once("DAO/EntityDAO.php");
 	
 	$URL = "sqlite:./entitiesDB.sqlite";
 
@@ -39,4 +39,4 @@
 	$dao->disconnect();		
 	http_response_code($resp['status']);
 	echo $resp['body']; 						
-?>
+

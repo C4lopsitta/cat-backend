@@ -1,5 +1,5 @@
 <?php
-	include_once("GenericDAO.php");
+	include_once("DAO/GenericDAO.php");
 
 	class GenericREST {
 	
