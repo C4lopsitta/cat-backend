@@ -8,23 +8,23 @@
 		public function __construct(GenericDAO $dao) {
 			$this->dao = $dao;
 		}
-		public function get($id) {
+		public function get($id): array {
 			$obj = $this->dao->read(intval($id));
 			return $obj? $this->response (200, $obj->to_json()): $this->response (404, "");
 		}
-		public function getAll() {
+		public function getAll(): array {
 			$objs = $this->dao->readAll();
 			return $this->response(200, json_encode($objs));
 		}
-		public function post(object $obj) {
+		public function post(object $obj): array {
 			$rc = $this->dao->create($obj);
-			return ($rc == -1)? $this->respond(410,""): $this->response(200, "");
+			return ($rc == -1)? $this->response(410,""): $this->response(200, "");
 		}
-		public function put(object $obj) {
+		public function put(object $obj): array {
 			$rc = $this->dao->update($obj);
-			return $rc? $this->respond(410, "") :$this->response(200, "");
+			return $rc? $this->response(410, "") :$this->response(200, "");
 		}
-		public function delete($id) {
+		public function delete($id): array {
 			$rc = $this->dao->delete($id);
 			return $rc? $this->response(404, ""): $this->response (200, "");
 		}
@@ -33,4 +33,4 @@
 			return( [ "status" => $status, "body" => $body ] );
 		}
 	}
-?>
+
