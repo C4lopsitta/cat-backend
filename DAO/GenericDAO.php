@@ -12,7 +12,7 @@ abstract class GenericDAO {
 	}	
 	public function disconnect() { $this->pdo = null; }
 	
-	abstract public function create(object $object): ?int;
+	abstract public function create(object $object): ?object;
 	abstract public function read(int $id): ?object;
 	abstract public function readAll(): ?array;
 	abstract public function update(object $object): bool;
