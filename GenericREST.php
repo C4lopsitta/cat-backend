@@ -1,6 +1,4 @@
 <?php
-	include_once("GenericDAO.php");
-
 	class GenericREST {
 	
 		private ?GenericDAO $dao = null;
