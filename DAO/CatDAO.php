@@ -1,6 +1,7 @@
 <?php
 
 include_once 'DAO/GenericDAO.php';
+include_once 'Utils/UUID.php';
 
 class CatDAO extends GenericDAO
 {
@@ -18,7 +19,7 @@ class CatDAO extends GenericDAO
 
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
-                ':id' => $object->getId(),
+                ':id' => UUID.genUuid(),
                 ':name' => $object->getName(),
                 ':age' => $object->getAge(),
                 ':description' => $object->getDescription(),
@@ -88,10 +89,28 @@ class CatDAO extends GenericDAO
         }
     }
 
-    public function readByOwner(int $id): ?object
+    public function readByOwner(int $idOwner): ?object
     {
-        // TODO: Implement readByOwner() method
-        return null;
+        try{
+            $sql = "SELECT * FROM cats WHERE cats.owner = :idOwner;";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':idOwner' => $idOwner]);
+            $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+            $cats = array();
+            foreach($results as $result){
+                $cats[] = array($result->uid, $result->name, $result->age, $result->description, $result->whenLastSeen,
+                    $result->whereLastSeen, $result->race, $result->furColor, $result->weight, $result->image, $result->imageMimeType,
+                    $result->price, $result->owner);
+            }
+
+            var_dump($cats);
+
+            return null;
+        }catch (PDOException $e){
+            echo($e->getMessage());
+            return null;
+        }
     }
 
     public function update(object $object): bool
