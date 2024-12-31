@@ -89,7 +89,7 @@ class CatDAO extends GenericDAO
         }
     }
 
-    public function readByOwner(int $idOwner): ?object
+    public function readByOwner(int $idOwner): ?array
     {
         try{
             $sql = "SELECT * FROM cats WHERE cats.owner = :idOwner;";
@@ -99,14 +99,12 @@ class CatDAO extends GenericDAO
 
             $cats = array();
             foreach($results as $result){
-                $cats[] = array($result->uid, $result->name, $result->age, $result->description, $result->whenLastSeen,
+                $cats[] = new Cat($result->uid, $result->name, $result->age, $result->description, $result->whenLastSeen,
                     $result->whereLastSeen, $result->race, $result->furColor, $result->weight, $result->image, $result->imageMimeType,
                     $result->price, $result->owner);
             }
 
-            var_dump($cats);
-
-            return null;
+            return $cats;
         }catch (PDOException $e){
             echo($e->getMessage());
             return null;
