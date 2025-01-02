@@ -2,6 +2,7 @@
 
 include_once 'DAO/GenericDAO.php';
 include_once 'Utils/UUID.php';
+include_once 'Model/Cat.php';
 
 class CatDAO extends GenericDAO
 {
@@ -9,12 +10,11 @@ class CatDAO extends GenericDAO
     public function create(object $object): ?object
     {
         try{
-            // uid NULL to replace with a string (in some mysterious way that I don't know now)
             $sql = "INSERT INTO cats(
                      uid, name, age, description, whenLastSeen, whereLastSeen, race, furColor, weight, isStray, image,
                      imageMimeType, price, owner
                  ) VALUES(
-                      NULL, :name, :age, :description, :whenLastSeen, :whereLastSeen, :race, :furColor, :weight,
+                      :id, :name, :age, :description, :whenLastSeen, :whereLastSeen, :race, :furColor, :weight,
                       :isStray, :image, :imageMimeType, :price, :owner);";
 
             $stmt = $this->pdo->prepare($sql);
@@ -113,7 +113,8 @@ class CatDAO extends GenericDAO
 
     public function update(object $object): bool
     {
-        $sql = "UPDATE cats SET
+        try{
+            $sql = "UPDATE cats SET
                 name = :name,
                 age = :age,
                 description = :description,
@@ -129,30 +130,39 @@ class CatDAO extends GenericDAO
                 owner = :owner
                 WHERE cats.uid = :id;
         ";
-        $stmt = $this->pdo->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
 
-        return $stmt->execute([
-            ':name' => $object->getName(),
-            ':age' => $object->getAge(),
-            ':description' => $object->getDescription(),
-            ':whenLastSeen' => $object->getWhenLastSeen(),
-            ':whereLastSeen' => $object->getWhereLastSeen(),
-            ':race' => $object->getRace(),
-            ':furColor' => $object->getFurColor(),
-            ':weight' => $object->getWeight(),
-            ':isStray' => $object->getIsStray(),
-            ':image' => $object->getImage(),
-            ':imageMimeType' => $object->getImageMimeType(),
-            ':price' => $object->getPrice(),
-            ':owner' => $object->getOwner(),
-            ':id' => $object->getUid()
-        ]);
+            return $stmt->execute([
+                ':name' => $object->getName(),
+                ':age' => $object->getAge(),
+                ':description' => $object->getDescription(),
+                ':whenLastSeen' => $object->getWhenLastSeen(),
+                ':whereLastSeen' => $object->getWhereLastSeen(),
+                ':race' => $object->getRace(),
+                ':furColor' => $object->getFurColor(),
+                ':weight' => $object->getWeight(),
+                ':isStray' => $object->getIsStray(),
+                ':image' => $object->getImage(),
+                ':imageMimeType' => $object->getImageMimeType(),
+                ':price' => $object->getPrice(),
+                ':owner' => $object->getOwner(),
+                ':id' => $object->getUid()
+            ]);
+        }catch (PDOException $e){
+            echo($e->getMessage());
+            return false;
+        }
     }
 
     public function delete(int $id): bool
     {
-        $sql = "DELETE FROM cats WHERE cats.uid = :id;";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([':id' => $id]);
+        try{
+            $sql = "DELETE FROM cats WHERE cats.uid = :id;";
+            $stmt = $this->pdo->prepare($sql);
+            return $stmt->execute([':id' => $id]);
+        }catch (PDOException $e){
+            echo($e->getMessage());
+            return false;
+        }
     }
 }
