@@ -36,7 +36,7 @@ class CatDAO extends GenericDAO
             ]);
 
             $id = $this->pdo->lastInsertId();
-            $object->setId($id);
+            $object->setUid($id);
 
             return $object;
         }catch (PDOException $e){
