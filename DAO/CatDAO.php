@@ -113,13 +113,46 @@ class CatDAO extends GenericDAO
 
     public function update(object $object): bool
     {
-        // TODO: Implement update() method.
-        return false;
+        $sql = "UPDATE cats SET
+                name = :name,
+                age = :age,
+                description = :description,
+                whenLastSeen = :whenLastSeen,
+                whereLastSeen = :whereLastSeen,
+                race = :race,
+                furColor = :furColor,
+                weight = :weight,
+                isStray = :isStray,
+                image = :image,
+                imageMimeType = :imageMimeType,
+                price = :price,
+                owner = :owner
+                WHERE cats.uid = :id;
+        ";
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':name' => $object->getName(),
+            ':age' => $object->getAge(),
+            ':description' => $object->getDescription(),
+            ':whenLastSeen' => $object->getWhenLastSeen(),
+            ':whereLastSeen' => $object->getWhereLastSeen(),
+            ':race' => $object->getRace(),
+            ':furColor' => $object->getFurColor(),
+            ':weight' => $object->getWeight(),
+            ':isStray' => $object->getIsStray(),
+            ':image' => $object->getImage(),
+            ':imageMimeType' => $object->getImageMimeType(),
+            ':price' => $object->getPrice(),
+            ':owner' => $object->getOwner(),
+            ':id' => $object->getUid()
+        ]);
     }
 
     public function delete(int $id): bool
     {
-        // TODO: Implement delete() method.
-        return false;
+        $sql = "DELETE FROM cats WHERE cats.uid = :id;";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([':id' => $id]);
     }
 }
