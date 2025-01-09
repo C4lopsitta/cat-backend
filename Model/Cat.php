@@ -11,6 +11,7 @@
         private ?bool $isStray;
         private ?string $image;
         private ?int $price;
+        private ?string $ownerUID;
 
         /**
          * @param string $uid
@@ -24,8 +25,9 @@
          * @param bool $isStray
          * @param string $image
          * @param int $price
+         * @param string $ownerUID
          */
-        public function __construct(string $uid, string $name, int $age, string $description, string $whenLastSeen, string $whereLastSeen, string $furColor, int $weight, bool $isStray, string $image, int $price) {
+        public function __construct(string $uid, string $name, int $age, string $description, string $whenLastSeen, string $whereLastSeen, string $furColor, int $weight, bool $isStray, string $image, int $price, string $ownerUID) {
             $this->uid = $uid;
             $this->name = $name;
             $this->age = $age;
@@ -37,6 +39,7 @@
             $this->isStray = $isStray;
             $this->image = $image;
             $this->price = $price;
+            $this->ownerUID = $ownerUID;
         }
 
         public function getUid(): string {
@@ -125,6 +128,14 @@
 
         public function setPrice(int $price): void {
             $this->price = $price;
+        }
+
+        public function getOwnerUID(): ?string {
+            return $this->ownerUID;
+        }
+
+        public function setOwnerUID(?string $ownerUID): void {
+            $this->ownerUID = $ownerUID;
         }
 
     }
