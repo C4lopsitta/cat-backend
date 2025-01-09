@@ -1,5 +1,9 @@
 <?php
-	include_once("REST/GenericREST.php");
+
+use DAO\EntityDAO;
+use REST\GenericREST;
+
+include_once("REST/GenericREST.php");
 	include_once("DAO/EntityDAO.php");
 	
 	$URL = "sqlite:./entitiesDB.sqlite";
