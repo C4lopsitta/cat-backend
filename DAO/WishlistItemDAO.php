@@ -1,14 +1,29 @@
 <?php
 
-class WishlistItem extends GenericDAO
+class WishlistItemDAO extends GenericDAO
 {
 
-    /**
-     * @throws Exception
-     */
     public function create(object $object): ?object
     {
-        throw new Exception('Not implemented');
+        try{
+            $sql = "INSERT INTO wishListItems(uid, owner, cat)
+                        VALUES (:id, :owner, :cat)";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':id' => UUID.genUuid(),
+                ':owner' => $object->getOwner(),
+                ':cat' => $object->getCat()
+            ]);
+
+            $id = $this->pdo->lastInsertId();
+            $object->setUid($id);
+
+            return $object;
+        }catch (PDOException $e){
+            echo($e->getMessage());
+            return null;
+        }
     }
 
     /**
