@@ -38,7 +38,25 @@ class CartDAO extends GenericDAO
 
     public function readAllCartItems(): ?array
     {
-        throw new Exception('Not implemented');
+        try{
+            $sql = "SELECT cats.* FROM cartItems, cats
+                        WHERE cats.uid = cartItems.cat;";
+
+            $resultSet = $this->pdo->query($sql);
+            $results = $resultSet->fetchAll();
+
+            $cats = array();
+            foreach ($results as $result) {
+                $cats[] = new Cat($result["uid"], $result["name"], $result["age"], $result["description"], $result["whenLastSeen"],
+                    $result["race"], $result["furColor"], $result["weight"], $result["image"], $result["imageMimeType"],
+                    $result["price"], $result["owner"]);
+            }
+
+            return $cats;
+        }catch (PDOException $e){
+            echo($e->getMessage());
+            return null;
+        }
     }
 
     public function update(object $object): bool
