@@ -1,6 +1,6 @@
 <?php
 
-class CartDAO extends GenericDAO
+class CartItemDAO extends GenericDAO
 {
 
     public function create(object $object): ?object
@@ -66,6 +66,16 @@ class CartDAO extends GenericDAO
 
     public function delete(int $id): bool
     {
-        throw new Exception('Not implemented');
+        try{
+            $sql = "DELETE FROM cartItems 
+                        WHERE cartItems.uid = :id;";
+
+            $stmt = $this->pdo->prepare($sql);
+            return $stmt->execute([':id' => $id]);
+
+        }catch (PDOException $e){
+            echo($e->getMessage());
+            return false;
+        }
     }
 }
