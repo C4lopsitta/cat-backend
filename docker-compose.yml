@@ -1,0 +1,27 @@
+services:
+  catapi:
+    image: nginx:alpine
+    volumes:
+      - ./app:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - catnet
+    ports:
+      - "80:80"
+    depends_on:
+      - php
+
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - catnet
+    volumes:
+      - ./app:/var/www/html
+    expose:
+      - 9000
+
+networks:
+  catnet:
+    driver: bridge
