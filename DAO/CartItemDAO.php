@@ -26,11 +26,17 @@ class CartItemDAO extends GenericDAO
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function read(int $id): ?object
     {
         throw new Exception('Not implemented');
     }
 
+    /**
+     * @throws Exception
+     */
     public function readAll(): ?array
     {
         throw new Exception('Not implemented');
@@ -59,6 +65,9 @@ class CartItemDAO extends GenericDAO
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function update(object $object): bool
     {
         throw new Exception('Not implemented');
