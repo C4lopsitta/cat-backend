@@ -66,18 +66,27 @@ class TokenDAO extends GenericDAO
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function readAll(): ?array
     {
-        return null;
+        throw new Exception('Not implemented');
     }
 
+    /**
+     * @throws Exception
+     */
     public function update(object $object): bool
     {
-        return false;
+        throw new Exception('Not implemented');
     }
 
+    /**
+     * @throws Exception
+     */
     public function delete(int $id): bool
     {
-        return false;
+        throw new Exception('Not implemented');
     }
 }
