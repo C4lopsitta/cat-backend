@@ -38,8 +38,7 @@ class CartDAO extends GenericDAO
 
     public function readAllCartItems(): ?array
     {
-
-        //TODO: Implement readAllCartItems
+        throw new Exception('Not implemented');
     }
 
     public function update(object $object): bool
@@ -49,6 +48,6 @@ class CartDAO extends GenericDAO
 
     public function delete(int $id): bool
     {
-        // TODO: Implement delete() method.
+        throw new Exception('Not implemented');
     }
 }
