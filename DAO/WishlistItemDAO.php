@@ -42,6 +42,29 @@ class WishlistItemDAO extends GenericDAO
         throw new Exception('Not implemented');
     }
 
+    public function readAllWishlistItems(): ?array
+    {
+        try{
+            $sql = "SELECT cats.* FROM wishListItems, cats
+                        WHERE cats.uid = wishListItems.cat;";
+
+            $resultSet = $this->pdo->query($sql);
+            $results = $resultSet->fetchAll();
+
+            $cats = array();
+            foreach ($results as $result) {
+                $cats[] = new Cat($result["uid"], $result["name"], $result["age"], $result["description"], $result["whenLastSeen"],
+                    $result["race"], $result["furColor"], $result["weight"], $result["image"], $result["imageMimeType"],
+                    $result["price"], $result["owner"]);
+            }
+
+            return $cats;
+        }catch (PDOException $e){
+            echo($e->getMessage());
+            return null;
+        }
+    }
+
     /**
      * @throws Exception
      */
