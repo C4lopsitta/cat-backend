@@ -14,7 +14,7 @@ CREATE TABLE users(
 CREATE TABLE tokens(
     token TEXT PRIMARY KEY,
     user VARCHAR(32) NOT NULL,
-    expirationDate INTEGER,
+    expirationDate INTEGER NOT NULL,
     FOREIGN KEY(user) REFERENCES users(uid)
 );
 
