@@ -4,7 +4,6 @@ namespace REST;
 
 use DAO\GenericDAO;
 
-include_once("DAO/GenericDAO.php");
 
 class GenericREST {
 

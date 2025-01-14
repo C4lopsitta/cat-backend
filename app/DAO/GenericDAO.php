@@ -1,16 +1,19 @@
 <?php
 
 namespace DAO;
-include_once("Entity.php");
+
+use PDO;
 
 abstract class GenericDAO {
-  protected ?PDO $pdo = null;
+  protected static ?PDO $pdo = null;
 
   public function __construct() {}
 
-  public function connect(string $conn_string): bool {
+  public function connect(): bool {
     if ($this->pdo != null) return false;
-    $this->pdo = new PDO($conn_string);
+    $connectionString = "mysql:host=db;port=3306;dbname=" . getenv("DB_NAME") . ";charset=utf8mb4";
+
+    $this->pdo = new PDO($connectionString, getenv('DB_USER'), getenv('DB_PASSWD'));
     $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     return true;
   }
