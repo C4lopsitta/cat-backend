@@ -1,4 +1,16 @@
 services:
+  db:
+    image: mariadb:latest
+    volumes:
+      - ./db_data:/var/lib/mysql
+    environment:
+      MARIADB_ROOT_PASSWORD: "catrootdb"
+      MARIADB_DATABASE: "catdb.mysql"
+      MARIADB_USER: "catdb"
+      MARIADB_PASSWORD: "catdb"
+    ports:
+      - "3307:3306"
+
   catapi:
     image: nginx:alpine
     volumes:
