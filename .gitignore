@@ -1,2 +1,4 @@
 /app/entities.sqlite
+db.env
+nginx.env
 .idea

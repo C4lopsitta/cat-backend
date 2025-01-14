@@ -22,11 +22,15 @@ class Uid {
   }
 
   static function format(string $uid): string {
-    return "";
+    return substr($uid, 0, 8) . '-' .
+        substr($uid, 8, 4) . '-' .
+        substr($uid, 12, 4) . '-' .
+        substr($uid, 16, 4) . '-' .
+        substr($uid, 20, 12);
   }
 
   static function compact(string $uid): string {
-    return "";
+    return str_replace("-", "", $uid);
   }
 
 }

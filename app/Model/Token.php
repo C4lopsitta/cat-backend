@@ -1,11 +1,35 @@
 <?php
 
 namespace Model;
+
+use Utilities\Uid;
+
+/**
+ *
+ */
 class Token
 {
     private string $token;
     private int $expirationDate;
     private string $userUID;
+
+    /**
+     * Generates a new User token from the User UID and give an optional duration
+     * @param string $userUID
+     * @param int $durationSecs
+     * @throws \Random\RandomException
+     * @return Token
+     */
+    static function generate(string $userUID, int $durationSecs = 3600): Token {
+        $token = hash("sha-512", bin2hex( random_bytes(64)) . "catapi");
+        $expiresAt = time() + $durationSecs;
+
+        if(strlen($userUID) > 32) {
+            $userUID = Uid::compact($userUID);
+        }
+
+        return new self($token, $expiresAt, $userUID);
+    }
 
     /**
      * @param string $token
