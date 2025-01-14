@@ -1,5 +1,7 @@
 <?php
 
+require_once "vendor/autoload.php";
+
 use BaseHandlers\Cats;
 use BaseHandlers\Users;
 use Utilities\Uid;
@@ -9,6 +11,7 @@ $apiBase = "/api/v1";
 $uri = str_replace($apiBase, "", $_SERVER['REQUEST_URI']);
 
 $uriParts = explode("/", $uri);
+header("Content-type: application/json");
 
 // [INFO] Switch the base part of the URI
 
@@ -24,5 +27,4 @@ switch ($uriParts[0]) {
     break;
 }
 
-header("Content-type: application/json");
 

@@ -6,7 +6,7 @@ use Utilities\CommonJsons;
 use Utilities\Uid;
 
 class Users {
-  static function handler(array $uriParts) {
+  static function handler(array $uriParts): void {
     if(sizeof($uriParts) == 1) {
       // root users not allowed, 404
       http_response_code(404);
