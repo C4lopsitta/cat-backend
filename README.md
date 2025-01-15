@@ -1,4 +1,11 @@
 # cat-backend
+This is the repository containing the backend API for the `cat-frontend`.
+
+## Structure
+- nginx container
+  - single page router for /api/v1/... paths handled in PHP with `apiHandler.php`
+- php-fpm container
+- mariadb container
 
 ## Running server
 You will need `docker` and `docker-compose`, these instructions are made for newer 

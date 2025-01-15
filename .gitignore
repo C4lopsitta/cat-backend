@@ -2,3 +2,4 @@
 db.env
 nginx.env
 .idea
+./db_data

@@ -35,6 +35,7 @@
   <component name="PhpIncludePathManager">
     <include_path>
       <path value="$PROJECT_DIR$/app/vendor/composer" />
+      <path value="$PROJECT_DIR$/app/vendor/phpmailer/phpmailer" />
     </include_path>
   </component>
   <component name="PhpInterpreters">
