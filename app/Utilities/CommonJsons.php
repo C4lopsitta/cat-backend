@@ -24,5 +24,25 @@ JSON;
 }
 JSON;
 
+  static string $MethodNotAllowed = <<< JSON
+{
+  "error": "Method not allowed",
+  "status": 405
+}
+JSON;
+
+  static function BadRequest(array $fieldErrors = []): string {
+      $fieldErrors = join(", ", $fieldErrors);
+      return <<< JSON
+{
+  "error": "Bad Request",
+  "fieldErrors": [{$fieldErrors}],
+  "status": 400
+}
+JSON;
+  }
+
+
+
 
 }

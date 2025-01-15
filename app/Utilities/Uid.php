@@ -12,6 +12,9 @@ class Uid {
     return false;
   }
 
+  /**
+   * @throws \Random\RandomException
+   */
   static function generate(): string {
     $data = random_bytes(16);
 

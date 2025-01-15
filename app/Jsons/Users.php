@@ -5,7 +5,8 @@ namespace Jsons;
 use Utilities\Uid;
 
 class Users {
-    static function listUsers(array $users): string {
+    // TODO)) Add pagination
+    static function listUsers(array $users, ?int $page, int $itemsPerPage): string {
         $usersJsonList = [];
 
         foreach ($users as $user) {

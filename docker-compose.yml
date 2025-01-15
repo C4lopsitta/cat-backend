@@ -32,7 +32,6 @@ services:
       - catnet
     volumes:
       - ./app:/var/www/html
-      - ./vendor:/var/www/vendor
     env_file:
       - nginx.env
     expose:
