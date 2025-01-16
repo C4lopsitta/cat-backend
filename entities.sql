@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users(
     username VARCHAR(32) NOT NULL,
     email VARCHAR(64) NOT NULL,
     image BLOB,
-    imageMime VARCHAR(16),
+    imageMimeType VARCHAR(16),
     description TEXT,
     pronouns VARCHAR(32),
     passwordHash TEXT NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS cats(
     weight INTEGER,
     isStray BOOLEAN,
     image BLOB,
-    imageMime VARCHAR(16),
+    imageMimeType VARCHAR(16),
     price INTEGER,
     owner VARCHAR(32),
     FOREIGN KEY(owner) REFERENCES users(uid)
