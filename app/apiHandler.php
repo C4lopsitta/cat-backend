@@ -22,7 +22,7 @@ switch ($uriParts[0]) {
       Cats::handler($uriParts);
       break;
   case "info":
-      echo CommonJsons::$Base;
+      echo CommonJsons::$Info;
       break;
   default:
       echo CommonJsons::$NotFound;
