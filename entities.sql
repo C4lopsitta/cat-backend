@@ -1,29 +1,28 @@
 CREATE TABLE IF NOT EXISTS users(
     uid VARCHAR(32) PRIMARY KEY,
-    username TEXT NOT NULL,
-    email TEXT NOT NULL,
-    passwordHash TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS tokens(
-    token VARCHAR(512) PRIMARY KEY,
-    user VARCHAR(32) NOT NULL,
-    expirationDate INTEGER NOT NULL,
-    FOREIGN KEY(user) REFERENCES users(uid)
+    username VARCHAR(32) NOT NULL,
+    email VARCHAR(64) NOT NULL,
+    image BLOB,
+    imageMimeType VARCHAR(16),
+    description TEXT,
+    pronouns VARCHAR(32),
+    passwordHash TEXT NOT NULL,
+    isAccountConfirmed BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS cats(
     uid VARCHAR(32) PRIMARY KEY,
-    name TEXT NOT NULL,
+    name VARCHAR(128) NOT NULL,
     age INTEGER,
     description TEXT,
     whenLastSeen DATE,
-    whereLastSeen TEXT,
-    race TEXT,
-    furColor TEXT,
+    whereLastSeen VARCHAR(32),
+    race VARCHAR(32),
+    furColor VARCHAR(16),
     weight INTEGER,
     isStray BOOLEAN,
     image BLOB,
+    imageMimeType VARCHAR(16),
     price INTEGER,
     owner VARCHAR(32),
     FOREIGN KEY(owner) REFERENCES users(uid)
