@@ -56,7 +56,7 @@ class UserDAO extends GenericDAO
 
         $cats = array();
         foreach ($results as $result) {
-            $cats[] = new User($result["uid"], $result["username"], $result["email"], $result["image"],
+            $cats[] = new User($result["username"], $result["uid"], $result["email"], $result["image"],
                 $result["imageMimeType"], $result["description"], $result["pronouns"], $result["passwordHash"],
                 $result["isAccountConfirmed"]);
         }

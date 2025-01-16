@@ -21,19 +21,20 @@ class Uid {
     $data[6] = chr((ord($data[6]) & 0x0f) | 0x40);
     $data[8] = chr((ord($data[8]) & 0x3f) | 0x80);
 
-    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    return strtolower(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4)));
   }
 
   static function format(string $uid): string {
-    return substr($uid, 0, 8) . '-' .
+    $uid = self::compact($uid);
+    return strtolower(substr($uid, 0, 8) . '-' .
         substr($uid, 8, 4) . '-' .
         substr($uid, 12, 4) . '-' .
         substr($uid, 16, 4) . '-' .
-        substr($uid, 20, 12);
+        substr($uid, 20, 12));
   }
 
   static function compact(string $uid): string {
-    return str_replace("-", "", $uid);
+    return strtolower(str_replace("-", "", $uid));
   }
 
 }

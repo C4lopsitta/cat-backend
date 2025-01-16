@@ -66,8 +66,7 @@ class CatDAO extends GenericDAO
         return null;
     }
 
-    public static function readAll(): ?array
-    {
+    public static function readAll(): ?array {
         $sql = "SELECT * FROM cats;";
 
         $resultSet = self::$pdo->query($sql);
@@ -83,8 +82,7 @@ class CatDAO extends GenericDAO
         return $cats;
     }
 
-    public static function readByOwner(int $idOwner): ?array
-    {
+    public static function readByOwner(int $idOwner): ?array {
         $sql = "SELECT * FROM cats WHERE cats.owner = :idOwner;";
         $stmt = self::$pdo->prepare($sql);
         $stmt->execute([':idOwner' => $idOwner]);
