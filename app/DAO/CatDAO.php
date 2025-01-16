@@ -1,5 +1,9 @@
 <?php
 
+namespace DAO;
+use Cat;
+use GenericDAO;
+
 include_once 'DAO/GenericDAO.php';
 include_once 'Utils/UUID.php';
 include_once 'Model/Cat.php';
@@ -9,7 +13,7 @@ class CatDAO extends GenericDAO
 
     public function create(object $object): ?object
     {
-        try{
+        try {
             $sql = "INSERT INTO cats(
                      uid, name, age, description, whenLastSeen, whereLastSeen, race, furColor, weight, isStray, image,
                      imageMimeType, price, owner
@@ -19,7 +23,7 @@ class CatDAO extends GenericDAO
 
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
-                ':id' => UUID.genUuid(),
+                ':id' => UUID . genUuid(),
                 ':name' => $object->getName(),
                 ':age' => $object->getAge(),
                 ':description' => $object->getDescription(),
@@ -39,7 +43,7 @@ class CatDAO extends GenericDAO
             $object->setUid($id);
 
             return $object;
-        }catch (PDOException $e){
+        } catch (PDOException $e) {
             echo($e->getMessage());
             return null;
         }
@@ -48,20 +52,20 @@ class CatDAO extends GenericDAO
 
     public function read(int $id): ?object
     {
-        try{
+        try {
             $sql = "SELECT * FROM cats WHERE cats.uid = :id;";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':id' => $id]);
 
             $data = $stmt->fetch(PDO::FETCH_OBJ);
-            if($data){
+            if ($data) {
                 return new Cat($data->uid, $data->name, $data->age, $data->description, $data->whenLastSeen,
                     $data->whereLastSeen, $data->race, $data->furColor, $data->weight, $data->image, $data->imageMimeType,
                     $data->price, $data->owner);
             }
 
             return null;
-        }catch (PDOException $e){
+        } catch (PDOException $e) {
             echo($e->getMessage());
             return null;
         }
@@ -69,7 +73,7 @@ class CatDAO extends GenericDAO
 
     public function readAll(): ?array
     {
-        try{
+        try {
             $sql = "SELECT * FROM cats;";
 
             $resultSet = $this->pdo->query($sql);
@@ -83,7 +87,7 @@ class CatDAO extends GenericDAO
             }
 
             return $cats;
-        }catch (PDOException $e){
+        } catch (PDOException $e) {
             echo($e->getMessage());
             return null;
         }
@@ -91,21 +95,21 @@ class CatDAO extends GenericDAO
 
     public function readByOwner(int $idOwner): ?array
     {
-        try{
+        try {
             $sql = "SELECT * FROM cats WHERE cats.owner = :idOwner;";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':idOwner' => $idOwner]);
             $results = $stmt->fetchAll(PDO::FETCH_OBJ);
 
             $cats = array();
-            foreach($results as $result){
+            foreach ($results as $result) {
                 $cats[] = new Cat($result->uid, $result->name, $result->age, $result->description, $result->whenLastSeen,
                     $result->whereLastSeen, $result->race, $result->furColor, $result->weight, $result->image, $result->imageMimeType,
                     $result->price, $result->owner);
             }
 
             return $cats;
-        }catch (PDOException $e){
+        } catch (PDOException $e) {
             echo($e->getMessage());
             return null;
         }
@@ -113,7 +117,7 @@ class CatDAO extends GenericDAO
 
     public function update(object $object): bool
     {
-        try{
+        try {
             $sql = "UPDATE cats SET
                 name = :name,
                 age = :age,
@@ -148,7 +152,7 @@ class CatDAO extends GenericDAO
                 ':owner' => $object->getOwner(),
                 ':id' => $object->getUid()
             ]);
-        }catch (PDOException $e){
+        } catch (PDOException $e) {
             echo($e->getMessage());
             return false;
         }
@@ -156,11 +160,11 @@ class CatDAO extends GenericDAO
 
     public function delete(int $id): bool
     {
-        try{
+        try {
             $sql = "DELETE FROM cats WHERE cats.uid = :id;";
             $stmt = $this->pdo->prepare($sql);
             return $stmt->execute([':id' => $id]);
-        }catch (PDOException $e){
+        } catch (PDOException $e) {
             echo($e->getMessage());
             return false;
         }

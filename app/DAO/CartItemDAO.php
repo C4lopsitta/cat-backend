@@ -1,17 +1,21 @@
 <?php
 
-class WishlistItemDAO extends GenericDAO
+namespace DAO;
+use Cat;
+use GenericDAO;
+
+class CartItemDAO extends GenericDAO
 {
 
     public function create(object $object): ?object
     {
-        try{
-            $sql = "INSERT INTO wishListItems(uid, owner, cat)
+        try {
+            $sql = "INSERT INTO cartItems(uid, owner, cat)
                         VALUES (:id, :owner, :cat)";
 
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
-                ':id' => UUID.genUuid(),
+                ':id' => UUID . genUuid(),
                 ':owner' => $object->getOwner(),
                 ':cat' => $object->getCat()
             ]);
@@ -20,7 +24,7 @@ class WishlistItemDAO extends GenericDAO
             $object->setUid($id);
 
             return $object;
-        }catch (PDOException $e){
+        } catch (PDOException $e) {
             echo($e->getMessage());
             return null;
         }
@@ -42,11 +46,11 @@ class WishlistItemDAO extends GenericDAO
         throw new Exception('Not implemented');
     }
 
-    public function readAllWishlistItems(): ?array
+    public function readAllCartItems(): ?array
     {
-        try{
-            $sql = "SELECT cats.* FROM wishListItems, cats
-                        WHERE cats.uid = wishListItems.cat;";
+        try {
+            $sql = "SELECT cats.* FROM cartItems, cats
+                        WHERE cats.uid = cartItems.cat;";
 
             $resultSet = $this->pdo->query($sql);
             $results = $resultSet->fetchAll();
@@ -59,7 +63,7 @@ class WishlistItemDAO extends GenericDAO
             }
 
             return $cats;
-        }catch (PDOException $e){
+        } catch (PDOException $e) {
             echo($e->getMessage());
             return null;
         }
@@ -75,14 +79,14 @@ class WishlistItemDAO extends GenericDAO
 
     public function delete(int $id): bool
     {
-        try{
-            $sql = "DELETE FROM wishListItems 
-                        WHERE wishListItems.uid = :id;";
+        try {
+            $sql = "DELETE FROM cartItems 
+                        WHERE cartItems.uid = :id;";
 
             $stmt = $this->pdo->prepare($sql);
             return $stmt->execute([':id' => $id]);
 
-        }catch (PDOException $e){
+        } catch (PDOException $e) {
             echo($e->getMessage());
             return false;
         }
