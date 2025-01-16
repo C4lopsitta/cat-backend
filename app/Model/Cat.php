@@ -13,6 +13,7 @@ class Cat
     private ?int $weight;
     private ?bool $isStray;
     private ?string $image;
+    private ?string $imageMimeType;
     private ?int $price;
     private ?string $ownerUID;
 
@@ -27,10 +28,11 @@ class Cat
      * @param int $weight
      * @param bool $isStray
      * @param string $image
+     * @param string $imageMimeType
      * @param int $price
      * @param string $ownerUID
      */
-    public function __construct(string $uid, string $name, int $age, string $description, string $whenLastSeen, string $whereLastSeen, string $furColor, int $weight, bool $isStray, string $image, int $price, string $ownerUID)
+    public function __construct(string $uid, string $name, int $age, string $description, string $whenLastSeen, string $whereLastSeen, string $furColor, int $weight, bool $isStray, string $image, string $imageMimeType, int $price, string $ownerUID)
     {
         $this->uid = $uid;
         $this->name = $name;
@@ -42,6 +44,7 @@ class Cat
         $this->weight = $weight;
         $this->isStray = $isStray;
         $this->image = $image;
+        $this->imageMimeType = $imageMimeType;
         $this->price = $price;
         $this->ownerUID = $ownerUID;
     }
@@ -144,6 +147,16 @@ class Cat
     public function setImage(string $image): void
     {
         $this->image = $image;
+    }
+
+    public function getImageMimeType(): string
+    {
+        return $this->imageMimeType;
+    }
+
+    public function setImageMimeType(string $imageMimeType): void
+    {
+        $this->imageMimeType = $imageMimeType;
     }
 
     public function getPrice(): int
