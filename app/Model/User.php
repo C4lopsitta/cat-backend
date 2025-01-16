@@ -24,7 +24,7 @@ class User
      * @param string $passwordHash
      * @param bool $isAccountConfirmed
      */
-    public function __construct(string $username, string $uid, string $email, ?string $image, ?string $imageMimeType, ?string $description, ?string $pronouns, string $passwordHash, bool $isAccountConfirmed) {
+    public function __construct(string $username, string $uid, string $email, ?string $image, ?string $imageMimeType, ?string $description, ?string $pronouns, string $passwordHash, bool $isAccountConfirmed = false) {
         $this->username = $username;
         $this->uid = $uid;
         $this->email = $email;

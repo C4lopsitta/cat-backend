@@ -2,7 +2,13 @@
 
 namespace BaseHandlers;
 
+use DAO\GenericDAO;
+use DAO\UserDAO;
+use Model\User;
 use Utilities\CommonJsons;
+use Utilities\Emails\ConfirmRegister;
+use Utilities\MailSender;
+use Utilities\Password;
 use Utilities\Regexes;
 use Utilities\Uid;
 
@@ -28,6 +34,9 @@ class Users {
                 return;
             } elseif($uriParts[1] == "authenticate") {
                 self::handleAuthenticate($uriParts);
+                return;
+            } elseif($uriParts[1] == "validateAccount") {
+                self::validateAccount($uriParts);
                 return;
             } elseif(strlen($uriParts[1]) == 32 + 4) {
                 Users::handleUidURI($uriParts);
@@ -72,9 +81,10 @@ class Users {
 
             $fieldErrors = [];
 
-            if($email == null || !preg_match(Regexes::$Email, $email)) { $fieldErrors[] = "email"; }
-            if($password == null || !preg_match(Regexes::$Password, $password)) { $fieldErrors[] = "password"; }
-            if($username == null || !preg_match(Regexes::$Username, $username)) { $fieldErrors[] = "username"; }
+            // TODO)) Fix regexp
+//            if($email == null || !preg_match(Regexes::$Email, $email)) { $fieldErrors[] = "email"; }
+//            if($password == null || !preg_match(Regexes::$Password, $password)) { $fieldErrors[] = "password"; }
+//            if($username == null || !preg_match(Regexes::$Username, $username)) { $fieldErrors[] = "username"; }
 
             if(sizeof($fieldErrors) > 0) {
                 http_response_code(400);
@@ -89,11 +99,61 @@ class Users {
                 return;
             }
 
+            $passwordHash = Password::hash($password);
+
+            $user = new User(
+               username: $username,
+               uid: "",
+               email: $email,
+               image: null,
+               imageMimeType: null,
+               description: $description,
+               pronouns: $pronouns,
+               passwordHash: $passwordHash
+            );
+
+            try {
+                GenericDAO::connect();
+                UserDAO::create($user);
+                GenericDAO::disconnect();
+            } catch (\Exception $ex) {
+                if($ex->getCode() == 23000) {
+                   http_response_code(401);
+                   echo \Jsons\Users::userExistsResponse($email);
+                } else {
+                    http_response_code(500);
+                    echo CommonJsons::ServerError($ex);
+                }
+                return;
+            }
+
             $emailConfirmationBaseUrl = $reqJson['emailConfirmationBaseUrl'] ?? null;
+
+            try {
+                MailSender::send(
+                   html: ConfirmRegister::html($username, $emailConfirmationBaseUrl, ""),
+                   text: ConfirmRegister::plainText($username, $emailConfirmationBaseUrl, ""),
+                   subject: "Kittens - Confirm your Account",
+                   emailDest: $email
+                );
+            } catch (\Exception $ex) {
+                http_response_code(500);
+                echo CommonJsons::ServerError($ex);
+                UserDAO::connect();
+                UserDAO::delete($user->getUid());
+                UserDAO::disconnect();
+                return;
+            }
+
+            echo \Jsons\Users::userRegistrationResponse(username: $username, email: $email, uid: Uid::format($user->getUid()));
         } else {
             http_response_code(405);
             echo CommonJsons::$MethodNotAllowed;
         }
+    }
+
+    private static function validateAccount(array $uriParts): void {
+
     }
 
     private static function handleAuthenticate(array $uriParts): void {

@@ -22,13 +22,13 @@ abstract class GenericDAO {
 
   abstract static public function create(object $object): ?object;
 
-  abstract static public function read(int $id);
+  abstract static public function read(string $id);
 
   abstract static public function readAll(): ?array;
 
   abstract static public function update(object $object): bool;
 
-  abstract static public function delete(int $id): bool;
+  abstract static public function delete(string $id): bool;
 }
 
 ?>

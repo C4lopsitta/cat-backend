@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utilities\Emails;
+namespace Utilities\Emails;
 
 
 class ConfirmRegister {

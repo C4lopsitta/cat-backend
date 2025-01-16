@@ -15,8 +15,7 @@ class UserDAO extends GenericDAO
     /**
      * @throws RandomException
      */
-    public static function create(object $object): ?object
-    {
+    public static function create(object $object): ?object {
         $sql = "INSERT INTO users(uid, username, email, passwordHash) 
                         VALUES(:id, :username, :email, :passwordHash);";
 
@@ -25,9 +24,9 @@ class UserDAO extends GenericDAO
         $stmt = self::$pdo->prepare($sql);
         $stmt->execute([
             ':id' => $uid,
-            ':username' => $object->username,
-            ':email' => $object->email,
-            ':passwordHash' => $object->passwordHash
+            ':username' => $object->getUsername(),
+            ':email' => $object->getEmail(),
+            ':passwordHash' => $object->getPasswordHash()
         ]);
 
         $object->setUid($uid);
@@ -35,8 +34,7 @@ class UserDAO extends GenericDAO
         return $object;
     }
 
-    public static function read(int $id): ?object
-    {
+    public static function read(string $id): ?object {
         $sql = "SELECT * FROM users WHERE users.uid = :id;";
         $stmt = self::$pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
@@ -50,8 +48,7 @@ class UserDAO extends GenericDAO
         return null;
     }
 
-    public static function readAll(): ?array
-    {
+    public static function readAll(): ?array {
         $sql = "SELECT * FROM users;";
 
         $resultSet = self::$pdo->query($sql);
@@ -67,8 +64,7 @@ class UserDAO extends GenericDAO
         return $cats;
     }
 
-    public static function update(object $object): bool
-    {
+    public static function update(object $object): bool {
         $sql = "UPDATE users SET
                 username = :username,
                 email = :email,
@@ -85,8 +81,7 @@ class UserDAO extends GenericDAO
         ]);
     }
 
-    public static function delete(int $id): bool
-    {
+    public static function delete(string $id): bool {
         $sql = "DELETE FROM users WHERE users.uid = :id;";
         $stmt = self::$pdo->prepare($sql);
         return $stmt->execute([':id' => $id]);
