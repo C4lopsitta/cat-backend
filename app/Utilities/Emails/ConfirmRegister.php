@@ -2,6 +2,7 @@
 
 namespace App\Utilities\Emails;
 
+
 class ConfirmRegister {
     static function html(string $username, string $baseUrl, string $confirmationUid): string {
         return <<< HTML
