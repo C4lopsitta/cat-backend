@@ -18,6 +18,8 @@ services:
     ports:
       - "6379:6379"
     restart: unless-stopped
+    networks:
+      - catnet
 
   catapi:
     image: nginx:alpine
