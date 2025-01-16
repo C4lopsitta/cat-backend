@@ -9,6 +9,7 @@ class Cat
     private ?string $description;
     private ?string $whenLastSeen;
     private ?string $whereLastSeen;
+    private ?string $race;
     private ?string $furColor;
     private ?int $weight;
     private ?bool $isStray;
@@ -24,6 +25,7 @@ class Cat
      * @param string $description
      * @param string $whenLastSeen
      * @param string $whereLastSeen
+     * @param string $race
      * @param string $furColor
      * @param int $weight
      * @param bool $isStray
@@ -32,7 +34,7 @@ class Cat
      * @param int $price
      * @param string $ownerUID
      */
-    public function __construct(string $uid, string $name, int $age, string $description, string $whenLastSeen, string $whereLastSeen, string $furColor, int $weight, bool $isStray, string $image, string $imageMimeType, int $price, string $ownerUID)
+    public function __construct(string $uid, string $name, int $age, string $description, string $whenLastSeen, string $whereLastSeen, string $race, string $furColor, int $weight, bool $isStray, string $image, string $imageMimeType, int $price, string $ownerUID)
     {
         $this->uid = $uid;
         $this->name = $name;
@@ -40,6 +42,7 @@ class Cat
         $this->description = $description;
         $this->whenLastSeen = $whenLastSeen;
         $this->whereLastSeen = $whereLastSeen;
+        $this->race = $race;
         $this->furColor = $furColor;
         $this->weight = $weight;
         $this->isStray = $isStray;
@@ -107,6 +110,14 @@ class Cat
     public function setWhereLastSeen(string $whereLastSeen): void
     {
         $this->whereLastSeen = $whereLastSeen;
+    }
+
+    public function getRace(): ?string {
+        return $this->race;
+    }
+
+    public function setRace(?string $race): void {
+        $this->race = $race;
     }
 
     public function getFurColor(): string
