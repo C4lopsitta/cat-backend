@@ -36,41 +36,38 @@ class Token
      * @param int $expirationDate
      * @param string $userUID
      */
-    public function __construct(string $token, int $expirationDate, string $userUID)
-    {
+    public function __construct(string $token, int $expirationDate, string $userUID) {
         $this->token = $token;
         $this->expirationDate = $expirationDate;
         $this->userUID = $userUID;
     }
 
-    public function getToken(): string
-    {
+    private static function getSalt(string $token): string {
+        return $token[0] . $token[8] . $token[16] . $token[32] . $token[64] . $token[128];
+    }
+
+    public function toDatabaseHash(): string {
+        return hash("sha512", $this->token . self::getSalt($this->token));
+    }
+
+    public static function getDatabaseHash(string $token): string {
+        return hash("sha512", $token . self::getSalt($token));
+    }
+
+    public function verifyValidity(): bool {
+        return time() < $this->expirationDate;
+    }
+
+    public function getToken(): string {
         return $this->token;
     }
 
-    public function setToken(string $token): void
-    {
-        $this->token = $token;
-    }
-
-    public function getExpirationDate(): int
-    {
+    public function getExpirationDate(): int {
         return $this->expirationDate;
     }
 
-    public function setExpirationDate(int $expirationDate): void
-    {
-        $this->expirationDate = $expirationDate;
-    }
-
-    public function getUserUID(): string
-    {
+    public function getUserUID(): string {
         return $this->userUID;
-    }
-
-    public function setUserUID(string $userUID): void
-    {
-        $this->userUID = $userUID;
     }
 
 }
