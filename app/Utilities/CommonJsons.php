@@ -2,8 +2,10 @@
 
 namespace Utilities;
 
+use Exception;
+
 class CommonJsons {
-  static string $Base = <<< JSON
+  static string $Info = <<< JSON
 {
   "version": "1",
   "docs": "https://c4lopsitta.github.io/cat-docs/index_md.html"
@@ -42,7 +44,14 @@ JSON;
 JSON;
   }
 
-
-
-
+  static function ServerError(Exception $exception, string $thrownIn = ""): string {
+      return <<< JSON
+{
+  "error": "Server error",
+  "exception": "{$exception->getMessage()}",
+  "thrownIn": "{$thrownIn}"
+  "status": 500
+}
+JSON;
+  }
 }

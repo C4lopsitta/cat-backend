@@ -58,16 +58,16 @@ class Token
         return time() < $this->expirationDate;
     }
 
-    public function setToken(string $token): void {
-        $this->token = $token;
+    public function getToken(): string {
+        return $this->token;
     }
 
-    public function setExpirationDate(int $expirationDate): void {
-        $this->expirationDate = $expirationDate;
+    public function getExpirationDate(): int {
+        return $this->expirationDate;
     }
 
-    public function setUserUID(string $userUID): void {
-        $this->userUID = $userUID;
+    public function getUserUID(): string {
+        return $this->userUID;
     }
 
 }

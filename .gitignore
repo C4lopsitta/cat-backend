@@ -3,3 +3,6 @@ db.env
 nginx.env
 .idea
 ./db_data
+./redis_data
+./app/vendor/composer
+./app/vendor/phpmailer
