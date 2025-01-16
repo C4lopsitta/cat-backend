@@ -12,7 +12,7 @@ use Exception;
 class CatDAO extends GenericDAO
 {
 
-    public function create(object $object): ?object
+    public static function create(object $object): ?object
     {
         try {
             $sql = "INSERT INTO cats(
@@ -22,7 +22,7 @@ class CatDAO extends GenericDAO
                       :id, :name, :age, :description, :whenLastSeen, :whereLastSeen, :race, :furColor, :weight,
                       :isStray, :image, :imageMimeType, :price, :owner);";
 
-            $stmt = $this->pdo->prepare($sql);
+            $stmt = self::$pdo->prepare($sql);
             $stmt->execute([
                 ':id' => UUID . genUuid(),
                 ':name' => $object->getName(),
@@ -40,7 +40,7 @@ class CatDAO extends GenericDAO
                 ':owner' => $object->getOwner()
             ]);
 
-            $id = $this->pdo->lastInsertId();
+            $id = self::$pdo->lastInsertId();
             $object->setUid($id);
 
             return $object;
@@ -51,11 +51,11 @@ class CatDAO extends GenericDAO
 
     }
 
-    public function read(int $id): ?object
+    public static function read(int $id): ?object
     {
         try {
             $sql = "SELECT * FROM cats WHERE cats.uid = :id;";
-            $stmt = $this->pdo->prepare($sql);
+            $stmt = self::$pdo->prepare($sql);
             $stmt->execute([':id' => $id]);
 
             $data = $stmt->fetch(PDO::FETCH_OBJ);
@@ -72,12 +72,12 @@ class CatDAO extends GenericDAO
         }
     }
 
-    public function readAll(): ?array
+    public static function readAll(): ?array
     {
         try {
             $sql = "SELECT * FROM cats;";
 
-            $resultSet = $this->pdo->query($sql);
+            $resultSet = self::$pdo->query($sql);
             $results = $resultSet->fetchAll();
 
             $cats = array();
@@ -94,11 +94,11 @@ class CatDAO extends GenericDAO
         }
     }
 
-    public function readByOwner(int $idOwner): ?array
+    public static function readByOwner(int $idOwner): ?array
     {
         try {
             $sql = "SELECT * FROM cats WHERE cats.owner = :idOwner;";
-            $stmt = $this->pdo->prepare($sql);
+            $stmt = self::$pdo->prepare($sql);
             $stmt->execute([':idOwner' => $idOwner]);
             $results = $stmt->fetchAll(PDO::FETCH_OBJ);
 
@@ -116,7 +116,7 @@ class CatDAO extends GenericDAO
         }
     }
 
-    public function update(object $object): bool
+    public static function update(object $object): bool
     {
         try {
             $sql = "UPDATE cats SET
@@ -135,7 +135,7 @@ class CatDAO extends GenericDAO
                 owner = :owner
                 WHERE cats.uid = :id;
         ";
-            $stmt = $this->pdo->prepare($sql);
+            $stmt = self::$pdo->prepare($sql);
 
             return $stmt->execute([
                 ':name' => $object->getName(),
@@ -159,11 +159,11 @@ class CatDAO extends GenericDAO
         }
     }
 
-    public function delete(int $id): bool
+    public static function delete(int $id): bool
     {
         try {
             $sql = "DELETE FROM cats WHERE cats.uid = :id;";
-            $stmt = $this->pdo->prepare($sql);
+            $stmt = self::$pdo->prepare($sql);
             return $stmt->execute([':id' => $id]);
         } catch (PDOException $e) {
             echo($e->getMessage());
