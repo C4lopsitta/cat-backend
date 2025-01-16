@@ -62,7 +62,7 @@ class CartItemDAO extends GenericDAO
         $cats = array();
         foreach ($results as $result) {
             $cats[] = new Cat($result["uid"], $result["name"], $result["age"], $result["description"], $result["whenLastSeen"],
-                $result["race"], $result["furColor"], $result["weight"], $result["image"], $result["imageMimeType"],
+                $result["whereLastSeen"], $result["race"], $result["furColor"], $result["weight"], $result["isStray"], $result["image"], $result["imageMimeType"],
                 $result["price"], $result["owner"]);
         }
 

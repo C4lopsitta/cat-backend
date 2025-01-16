@@ -43,7 +43,8 @@ class UserDAO extends GenericDAO
 
         $data = $stmt->fetch(PDO::FETCH_OBJ);
         if ($data) {
-            return new User($data->uid, $data->username, $data->email, $data->passwordHash);
+            return new User($data->uid, $data->username, $data->email, $data->image, $data->imageMimeType,
+                $data->description, $data->pronouns, $data->passwordHash, $data->isAccountConfirmed);
         }
 
         return null;
@@ -58,7 +59,9 @@ class UserDAO extends GenericDAO
 
         $cats = array();
         foreach ($results as $result) {
-            $cats[] = new User($result["uid"], $result["username"], $result["email"], $result["passwordHash"]);
+            $cats[] = new User($result["uid"], $result["username"], $result["email"], $result["image"],
+                $result["imageMimeType"], $result["description"], $result["pronouns"], $result["passwordHash"],
+                $result["isAccountConfirmed"]);
         }
 
         return $cats;

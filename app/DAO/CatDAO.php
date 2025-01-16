@@ -59,7 +59,7 @@ class CatDAO extends GenericDAO
         $data = $stmt->fetch(PDO::FETCH_OBJ);
         if ($data) {
             return new Cat($data->uid, $data->name, $data->age, $data->description, $data->whenLastSeen,
-                $data->whereLastSeen, $data->race, $data->furColor, $data->weight, $data->image, $data->imageMimeType,
+                $data->whereLastSeen, $data->race, $data->furColor, $data->weight, $data->isStray, $data->image, $data->imageMimeType,
                 $data->price, $data->owner);
         }
 
@@ -76,7 +76,7 @@ class CatDAO extends GenericDAO
         $cats = array();
         foreach ($results as $result) {
             $cats[] = new Cat($result["uid"], $result["name"], $result["age"], $result["description"], $result["whenLastSeen"],
-                $result["race"], $result["furColor"], $result["weight"], $result["image"], $result["imageMimeType"],
+                $result["whereLastSeen"], $result["race"], $result["furColor"], $result["weight"], $result["isStray"], $result["image"], $result["imageMimeType"],
                 $result["price"], $result["owner"]);
         }
 
@@ -93,7 +93,7 @@ class CatDAO extends GenericDAO
         $cats = array();
         foreach ($results as $result) {
             $cats[] = new Cat($result->uid, $result->name, $result->age, $result->description, $result->whenLastSeen,
-                $result->whereLastSeen, $result->race, $result->furColor, $result->weight, $result->image, $result->imageMimeType,
+                $result->whereLastSeen, $result->race,$result->furColor, $result->weight, $result->isStray, $result->image, $result->imageMimeType,
                 $result->price, $result->owner);
         }
 
