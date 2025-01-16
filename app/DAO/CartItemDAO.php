@@ -1,8 +1,12 @@
 <?php
 
 namespace DAO;
-use Cat;
-use GenericDAO;
+
+use Model\Cat;
+use DAO\GenericDAO;
+
+use PDO;
+use Exception;
 
 class CartItemDAO extends GenericDAO
 {

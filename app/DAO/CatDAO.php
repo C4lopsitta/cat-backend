@@ -1,12 +1,13 @@
 <?php
 
 namespace DAO;
-use Cat;
-use GenericDAO;
 
-include_once 'DAO/GenericDAO.php';
-include_once 'Utils/UUID.php';
-include_once 'Model/Cat.php';
+use Model\Cat;
+use Utilities\Uid;
+use DAO\GenericDAO;
+
+use PDO;
+use Exception;
 
 class CatDAO extends GenericDAO
 {

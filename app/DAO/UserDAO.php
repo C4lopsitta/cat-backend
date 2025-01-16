@@ -1,12 +1,13 @@
 <?php
 
 namespace DAO;
-use GenericDAO;
-use User;
 
-include_once 'DAO/GenericDAO.php';
-include_once 'Utils/UUID.php';
-include_once 'Model/User.php';
+use DAO\GenericDAO;
+use Utilities\Uid;
+use Model\User;
+
+use PDO;
+use Exception;
 
 class UserDAO extends GenericDAO
 {
