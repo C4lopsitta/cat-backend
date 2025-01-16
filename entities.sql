@@ -2,14 +2,8 @@ CREATE TABLE IF NOT EXISTS users(
     uid VARCHAR(32) PRIMARY KEY,
     username TEXT NOT NULL,
     email TEXT NOT NULL,
-    passwordHash TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS tokens(
-    token VARCHAR(512) PRIMARY KEY,
-    user VARCHAR(32) NOT NULL,
-    expirationDate INTEGER NOT NULL,
-    FOREIGN KEY(user) REFERENCES users(uid)
+    passwordHash TEXT NOT NULL,
+    isAccountConfirmed BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS cats(
