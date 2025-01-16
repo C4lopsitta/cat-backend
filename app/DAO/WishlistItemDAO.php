@@ -4,6 +4,7 @@ namespace DAO;
 
 use Model\Cat;
 use DAO\GenericDAO;
+use Utilities\Uid;
 
 use PDO;
 use Exception;
@@ -17,15 +18,16 @@ class WishlistItemDAO extends GenericDAO
             $sql = "INSERT INTO wishListItems(uid, owner, cat)
                         VALUES (:id, :owner, :cat)";
 
+            $uid = Uid::compact(Uid::generate());
+
             $stmt = self::$pdo->prepare($sql);
             $stmt->execute([
-                ':id' => UUID . genUuid(),
+                ':id' => $uid,
                 ':owner' => $object->getOwner(),
                 ':cat' => $object->getCat()
             ]);
 
-            $id = self::$pdo->lastInsertId();
-            $object->setUid($id);
+            $object->setUid($uid);
 
             return $object;
         } catch (PDOException $e) {

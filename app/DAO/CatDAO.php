@@ -22,9 +22,11 @@ class CatDAO extends GenericDAO
                       :id, :name, :age, :description, :whenLastSeen, :whereLastSeen, :race, :furColor, :weight,
                       :isStray, :image, :imageMimeType, :price, :owner);";
 
+            $uid = Uid::compact(Uid::generate());
+
             $stmt = self::$pdo->prepare($sql);
             $stmt->execute([
-                ':id' => UUID . genUuid(),
+                ':id' => $uid,
                 ':name' => $object->getName(),
                 ':age' => $object->getAge(),
                 ':description' => $object->getDescription(),
@@ -40,8 +42,7 @@ class CatDAO extends GenericDAO
                 ':owner' => $object->getOwner()
             ]);
 
-            $id = self::$pdo->lastInsertId();
-            $object->setUid($id);
+            $object->setUid($uid);
 
             return $object;
         } catch (PDOException $e) {

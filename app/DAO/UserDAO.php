@@ -18,16 +18,17 @@ class UserDAO extends GenericDAO
             $sql = "INSERT INTO users(uid, username, email, passwordHash) 
                         VALUES(:id, :username, :email, :passwordHash);";
 
+            $uid = Uid::compact(Uid::generate());
+
             $stmt = self::$pdo->prepare($sql);
             $stmt->execute([
-                ':id' => UUID . genUuid(),
+                ':id' => $uid,
                 ':username' => $object->username,
                 ':email' => $object->email,
                 ':passwordHash' => $object->passwordHash
             ]);
 
-            $id = self::$pdo->lastInsertId();
-            $object->setUid($id);
+            $object->setUid($uid);
 
             return $object;
         } catch (PDOException $e) {
