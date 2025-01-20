@@ -11,7 +11,9 @@ RUN apt-get update && apt-get install -y \
 
 RUN rm -rf /var/lib/apt/lists/*
 
-RUN pecl install redis
+RUN pecl install --onlyreqdeps --force redis \
+&& rm -rf /tmp/pear \
+&& docker-php-ext-enable redis
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 

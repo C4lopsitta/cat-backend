@@ -2,8 +2,6 @@
 
 namespace Jsons;
 
-use Utilities\Uid;
-
 class Users {
     // TODO)) Add pagination
     static function listUsers(array $users, ?int $page, int $itemsPerPage): string {

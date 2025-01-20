@@ -2,7 +2,8 @@
   "license": "GPL-3.0-only",
   "require": {
     "phpmailer/phpmailer": "^6.9",
-    "ext-pdo": "*"
+    "ext-pdo": "*",
+    "ext-redis": "*"
   },
   "autoload": {
     "psr-4": {

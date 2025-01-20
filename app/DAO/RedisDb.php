@@ -3,6 +3,7 @@
 namespace DAO;
 
 use Exception;
+use Redis;
 use RedisException;
 use Utilities\Uid;
 
@@ -14,11 +15,11 @@ class RedisDb {
      */
     static public function connect() {
         try {
-            $redis = new Redis();
+            self::$instance = new Redis();
 
-            $redis->connect('redis', 6379);
+            self::$instance->connect('redis', 6379);
         } catch (Exception $e) {
-            $redis = null;
+            self::$instance = null;
             throw $e;
         }
     }

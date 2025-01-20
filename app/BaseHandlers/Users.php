@@ -7,7 +7,6 @@ use DAO\RedisDb;
 use DAO\UserDAO;
 use Model\Token;
 use Model\User;
-use mysql_xdevapi\Exception;
 use Utilities\CommonJsons;
 use Utilities\Emails\ConfirmRegister;
 use Utilities\MailSender;
@@ -144,13 +143,14 @@ class Users {
 
             try {
                 RedisDb::connect();
+
+                $confirmationIdToken = RedisDb::generateAndStoreAccountConfirmToken($user->getUid());
             } catch(\Exception $ex) {
                 http_response_code(500);
                 echo CommonJsons::ServerError($ex);
+                UserDAO::delete($user->getUid());
                 return;
             }
-
-            $confirmationIdToken = RedisDb::generateAndStoreAccountConfirmToken($user->getUid());
 
             try {
                 MailSender::send(
