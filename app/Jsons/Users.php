@@ -54,9 +54,10 @@ JSON;
 JSON;
     }
 
-    public static function newUserTokenResponse(string $token, int $expiresIn) {
+    public static function newUserTokenResponse(string $uid, string $token, int $expiresIn) {
         return <<< JSON
 {
+  "uid": "{$uid}",
   "token": "{$token}",
   "expiresIn": {$expiresIn}
 }

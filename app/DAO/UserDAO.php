@@ -45,6 +45,30 @@ class UserDAO extends GenericDAO
         return null;
     }
 
+    public static function fetchUserUidFromEmail(string $email): ?string {
+        $sql = "SELECT uid FROM users WHERE email='{$email}';";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute();
+
+        $data = $stmt->fetch(PDO::FETCH_OBJ);
+
+        if ($data) {
+            return Uid::compact($data->uid);
+        }
+        return null;
+    }
+
+
+
+    public static function doesUserExist(string $email): bool {
+        $sql = "SELECT * FROM users WHERE email LIKE '{$email}';";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute();
+
+        $data = $stmt->fetch(PDO::FETCH_OBJ);
+        return (bool)$data;
+    }
+
     public static function readAll(): ?array {
         $sql = "SELECT * FROM users;";
 

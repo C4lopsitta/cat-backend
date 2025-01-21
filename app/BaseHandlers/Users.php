@@ -252,6 +252,49 @@ class Users {
     }
 
     private static function handleAuthenticate(array $uriParts): void {
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $json = json_decode(file_get_contents('php://input'), true);
 
+            try {
+                GenericDAO::connect();
+                RedisDb::connect();
+
+                if(!UserDAO::doesUserExist($json['email'])) {
+                    http_response_code(400);
+                    echo CommonJsons::BadRequest(["email"]);
+                    GenericDAO::disconnect();
+                    return;
+                }
+
+                $userUid = UserDAO::fetchUserUidFromEmail($json['email']);
+                $passwordHash = Password::hash($json['password']);
+
+                $user = UserDAO::read($userUid);
+
+
+                if(strcmp($user->getPasswordHash(), $passwordHash) == 0) {
+                    // generate token
+                    $token = Token::generate($user->getUid());
+                    RedisDb::storeUserToken($token->getToken(), $user->getUid());
+
+                    echo \Jsons\Users::newUserTokenResponse($user->getUid(), $token->getToken(), 3600);
+                } else {
+                    http_response_code(400);
+                    echo CommonJsons::BadRequest(["email"]);
+                    GenericDAO::disconnect();
+                    return;
+                }
+
+                GenericDAO::disconnect();
+            } catch(\Exception $ex) {
+                http_response_code(500);
+                error_log("Server Error on /api/v1/cats/authenticate.\n--- TRACE ---\n{$ex->getTrace()}\n");
+                echo CommonJsons::ServerError($ex);
+                return;
+            }
+        } else {
+            http_response_code(405);
+            echo CommonJsons::$MethodNotAllowed;
+        }
     }
 }

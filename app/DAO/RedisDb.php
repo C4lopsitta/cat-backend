@@ -3,6 +3,7 @@
 namespace DAO;
 
 use Exception;
+use http\Exception\BadMessageException;
 use Redis;
 use RedisException;
 use Utilities\Uid;
@@ -31,22 +32,39 @@ class RedisDb {
 
         $userUid = Uid::compact($userUid);
 
-        self::$instance->setex('token:'.$userUid, 3600, $token);
+        self::$instance->setex('token:'.$token, 3600, $userUid);
     }
 
-    static public function validateUserToken(string $token): bool {
-
-    }
-
-    static public function invalidateUserTokens(string $userUid) {
-        if(self::$instance == null) {
-            throw new RedisException('Redis connection not established');
+    static public function validateUserToken(string $token, string $userUid): bool {
+        if(!self::$instance) {
+            throw new RedisException("RedisDb connection not established");
         }
 
         $userUid = Uid::compact($userUid);
 
-        self::$instance->del("token:{$userUid}");
+        $redisUserUid = self::$instance->get("token:$token");
+        $redisUserUid = Uid::compact($redisUserUid);
+
+        if(!$userUid) {
+            throw new BadMessageException("User token not found");
+        }
+
+        if(strcmp($redisUserUid, $userUid) == 0) {
+            return true;
+        }
+
+        return false;
     }
+
+//    static public function invalidateUserTokens(string $userUid) {
+//        if(self::$instance == null) {
+//            throw new RedisException('Redis connection not established');
+//        }
+//
+//        $userUid = Uid::compact($userUid);
+//
+//        self::$instance->del("token:{$userUid}");
+//    }
 
     /**
      * Generates a token to send to the user for account verification that expires after 24 hours.
@@ -82,4 +100,28 @@ class RedisDb {
         return ($userUid != null) ? Uid::format($userUid) : null;
     }
 
+
+
+
+
+
+
+    static public function storeTestingToken(string $token): void {
+        if(!self::$instance) {
+            throw new RedisException("RedisDb connection not established");
+        }
+
+        self::$instance->setex('testingToken', 60 * 60 * 24, $token);
+    }
+
+    static public function testTestingToken(string $token): bool {
+        if(!self::$instance) {
+            throw new RedisException("RedisDb connection not established");
+        }
+
+        if( strcmp(self::$instance->get("testingToken"), $token) == 0 ) {
+            return true;
+        }
+        return false;
+    }
 }
