@@ -49,6 +49,7 @@ class Users {
                 return;
             } elseif(strlen($uriParts[1]) == 32 + 4) {
                 Users::handleUidURI($uriParts);
+                return;
             } else {
                 http_response_code(404);
                 echo CommonJsons::$NotFound;
@@ -67,8 +68,9 @@ class Users {
             return;
         }elseif (Uid::verify($uriParts[1])) {
             if (sizeof($uriParts) == 3) {
-                if($uriParts[2] == "validate") {
+                if ($uriParts[2] == "validate") {
                     self::validateAccount($uriParts);
+                    return;
                 }
                 // uid + some action
                 return;
@@ -127,6 +129,9 @@ class Users {
             try {
                 GenericDAO::connect();
                 UserDAO::create($user);
+
+                error_log("Created user with UID " . $user->getUid());
+
                 GenericDAO::disconnect();
             } catch (\Exception $ex) {
                 if($ex->getCode() == 23000) {
@@ -143,7 +148,6 @@ class Users {
 
             try {
                 RedisDb::connect();
-
                 $confirmationIdToken = RedisDb::generateAndStoreAccountConfirmToken($user->getUid());
             } catch(\Exception $ex) {
                 http_response_code(500);
@@ -200,7 +204,7 @@ class Users {
 
             if($redisUserUid == null || strlen($redisUserUid) < 1) {
                 http_response_code(401);
-                // TODO)) Token expired or doesnt exist
+                echo \Jsons\Users::$tokenExpiredOrUsed;
                 return;
             }
 
@@ -223,17 +227,24 @@ class Users {
 
                     RedisDb::storeUserToken($newUserToken->getToken(), $user->getUid());
 
+                    $user->setIsAccountConfirmed(true);
+                    GenericDAO::connect();
+                    UserDAO::update($user);
+                    GenericDAO::disconnect();
+
                     echo \Jsons\Users::newUserTokenResponse($newUserToken->getToken(), 3600);
 
                 } catch (\Exception $ex) {
                     http_response_code(500);
+                    error_log("Exception thrown in Users::validateAccount()\n--- TRACE ---\n{$ex->getMessage()}\n");
+                    error_log($ex);
                     echo CommonJsons::ServerError($ex);
                     return;
                 }
+            } else {
+                http_response_code(400);
+                echo CommonJsons::BadRequest(["confirmationId"]);
             }
-
-            http_response_code(400);
-            echo CommonJsons::BadRequest(["confirmationId"]);
         } else {
             http_response_code(405);
             echo CommonJsons::$MethodNotAllowed;

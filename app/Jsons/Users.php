@@ -62,4 +62,12 @@ JSON;
 }
 JSON;
     }
+
+    public static string $tokenExpiredOrUsed = <<< JSON
+{
+  "error": "Token expired",
+  "status": 401
+}
+JSON;
+
 }

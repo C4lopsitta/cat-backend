@@ -16,32 +16,29 @@ class UserDAO extends GenericDAO
      * @throws RandomException
      */
     public static function create(object $object): ?object {
-        $sql = "INSERT INTO users(uid, username, email, passwordHash) 
-                        VALUES(:id, :username, :email, :passwordHash);";
-
         $uid = Uid::compact(Uid::generate());
 
-        $stmt = self::$pdo->prepare($sql);
-        $stmt->execute([
-            ':id' => $uid,
-            ':username' => $object->getUsername(),
-            ':email' => $object->getEmail(),
-            ':passwordHash' => $object->getPasswordHash()
-        ]);
+        $sql = "INSERT INTO users 
+                        VALUES(:uid, '{$object->getUsername()}', '{$object->getEmail()}', null, null, '{$object->getDescription()}', '{$object->getPronouns()}', '{$object->getPasswordHash()}', false)";
 
-        $object->setUid($uid);
+
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute(['uid' => $uid]);
+
+        $object->setUid(Uid::format($uid));
 
         return $object;
     }
 
     public static function read(string $id): ?object {
-        $sql = "SELECT * FROM users WHERE users.uid = :id;";
+        $id = Uid::compact($id);
+        $sql = "SELECT * FROM users WHERE users.uid LIKE '{$id}';";
         $stmt = self::$pdo->prepare($sql);
-        $stmt->execute([':id' => $id]);
+        $stmt->execute();
 
         $data = $stmt->fetch(PDO::FETCH_OBJ);
         if ($data) {
-            return new User($data->uid, $data->username, $data->email, $data->image, $data->imageMimeType,
+            return new User($data->username, $data->uid, $data->email, $data->image, $data->imageMimeType,
                 $data->description, $data->pronouns, $data->passwordHash, $data->isAccountConfirmed);
         }
 
@@ -67,17 +64,23 @@ class UserDAO extends GenericDAO
     public static function update(object $object): bool {
         $sql = "UPDATE users SET
                 username = :username,
-                email = :email,
-                passwordHash = :passwordHash
-                WHERE users.uid = :id;
+                description = :description,
+                pronouns = :pronouns,
+                image = :image,
+                imageMimeType = :imageMimeType,
+                isAccountConfirmed = :isAccountConfirmed
+                WHERE users.uid LIKE :id;
         ";
         $stmt = self::$pdo->prepare($sql);
 
         return $stmt->execute([
-            ':username' => $object->username,
-            ':email' => $object->email,
-            ':passwordHash' => $object->passwordHash,
-            ':id' => $object->id
+            ':username' => $object->getUsername(),
+            ':description' => $object->getDescription(),
+            ':pronouns' => $object->getPronouns(),
+            ':image' => $object->getImage(),
+            ':imageMimeType' => $object->getImageMimeType(),
+            ':isAccountConfirmed' => $object->isAccountConfirmed(),
+            ':id' => $object->getUid()
         ]);
     }
 

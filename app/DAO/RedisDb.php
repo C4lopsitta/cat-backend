@@ -24,8 +24,14 @@ class RedisDb {
         }
     }
 
-    static public function storeUserToken(string $token, string $userUid) {
+    static public function storeUserToken(string $token, string $userUid): void {
+        if(!self::$instance) {
+            throw new RedisException("RedisDb connection not established");
+        }
 
+        $userUid = Uid::compact($userUid);
+
+        self::$instance->setex('token:'.$userUid, 3600, $token);
     }
 
     static public function validateUserToken(string $token): bool {

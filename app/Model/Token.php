@@ -21,7 +21,7 @@ class Token
      * @return Token
      */
     static function generate(string $userUID, int $durationSecs = 3600): Token {
-        $token = hash("sha-512", bin2hex( random_bytes(64)) . "catapi");
+        $token = hash("sha512", bin2hex( random_bytes(64)) . "catapi");
         $expiresAt = time() + $durationSecs;
 
         if(strlen($userUID) > 32) {
