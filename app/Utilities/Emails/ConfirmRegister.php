@@ -114,7 +114,6 @@ class ConfirmRegister {
 </html>
 HTML;
     }
-
     static function plainText(string $username, string $baseUrl, string $confirmationUid, string $userUid): string {
         return "Hi $username!\nOpen the following link in the browser to complete your account registration.\n$baseUrl?confirmationId=$confirmationUid&userUid=$userUid";
     }
