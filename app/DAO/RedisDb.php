@@ -56,15 +56,15 @@ class RedisDb {
         return false;
     }
 
-//    static public function invalidateUserTokens(string $userUid) {
-//        if(self::$instance == null) {
-//            throw new RedisException('Redis connection not established');
-//        }
-//
-//        $userUid = Uid::compact($userUid);
-//
-//        self::$instance->del("token:{$userUid}");
-//    }
+    static public function invalidateUserTokens(string $userUid) {
+        if(self::$instance == null) {
+            throw new RedisException('Redis connection not established');
+        }
+
+        $userUid = Uid::compact($userUid);
+
+        self::$instance->del("token:{$userUid}");
+    }
 
     /**
      * Generates a token to send to the user for account verification that expires after 24 hours.

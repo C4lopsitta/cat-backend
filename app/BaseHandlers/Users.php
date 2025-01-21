@@ -106,13 +106,6 @@ class Users {
                 return;
             }
 
-            // TODO)) Add email_already_in_use error
-            if(false) {
-                http_response_code(401);
-                echo "todo response email in use";
-                return;
-            }
-
             $passwordHash = Password::hash($password);
 
             $user = new User(
@@ -166,9 +159,13 @@ class Users {
             } catch (\Exception $ex) {
                 http_response_code(500);
                 echo CommonJsons::ServerError($ex);
-                UserDAO::connect();
-                UserDAO::delete($user->getUid());
-                UserDAO::disconnect();
+                try {
+                    UserDAO::connect();
+                    UserDAO::delete($user->getUid());
+                    UserDAO::disconnect();
+                } catch (\Exception $ex) {
+                    echo $ex->getMessage();
+                }
                 return;
             }
 
@@ -232,7 +229,7 @@ class Users {
                     UserDAO::update($user);
                     GenericDAO::disconnect();
 
-                    echo \Jsons\Users::newUserTokenResponse($newUserToken->getToken(), 3600);
+                    echo \Jsons\Users::newUserTokenResponse($user->getUid(), $newUserToken->getToken(), 3600);
 
                 } catch (\Exception $ex) {
                     http_response_code(500);
@@ -267,12 +264,11 @@ class Users {
                 }
 
                 $userUid = UserDAO::fetchUserUidFromEmail($json['email']);
-                $passwordHash = Password::hash($json['password']);
+                $password = $json['password'];
 
                 $user = UserDAO::read($userUid);
 
-
-                if(strcmp($user->getPasswordHash(), $passwordHash) == 0) {
+                if(Password::verify($password, $user->getPasswordHash())) {
                     // generate token
                     $token = Token::generate($user->getUid());
                     RedisDb::storeUserToken($token->getToken(), $user->getUid());
