@@ -15,6 +15,8 @@ RUN pecl install --onlyreqdeps --force redis \
 && rm -rf /tmp/pear \
 && docker-php-ext-enable redis
 
+RUN pecl install redis
+
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 EXPOSE 9000
