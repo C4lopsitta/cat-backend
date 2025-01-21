@@ -1,4 +1,15 @@
-<?php
+<?php /** @noinspection ALL */
+/** @noinspection ALL */
+
+/*
+ * Copyright (c) 2025.
+ *
+ * Code is licensed under GNU GPLv3 License and available in the Copying file.
+ * Code was written by:
+ * - Simone Robaldo ( simone.robaldo at itiscuneo.eu )
+ * - Giulia Vadelli ( giulia.vadelli at itiscuneo.eu )
+ * - Daniele Torchio ( daniele.torchio at itiscuneo.eu )
+ */
 
 namespace Utilities;
 
@@ -37,6 +48,7 @@ JSON;
   static function BadRequest(array $fieldErrors = []): string {
       $fieldErrors = join("\", \"", $fieldErrors);
       $fieldErrors = "\"$fieldErrors\"";
+      /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
       return <<< JSON
 {
   "error": "Bad Request",
@@ -47,6 +59,7 @@ JSON;
   }
 
   static function ServerError(Exception $exception, string $thrownIn = ""): string {
+      /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
       return <<< JSON
 {
   "error": "Server error",

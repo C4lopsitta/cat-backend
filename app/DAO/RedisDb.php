@@ -1,4 +1,14 @@
-<?php
+<?php /** @noinspection ALL */
+
+/*
+ * Copyright (c) 2025.
+ *
+ * Code is licensed under GNU GPLv3 License and available in the Copying file.
+ * Code was written by:
+ * - Simone Robaldo ( simone.robaldo at itiscuneo.eu )
+ * - Giulia Vadelli ( giulia.vadelli at itiscuneo.eu )
+ * - Daniele Torchio ( daniele.torchio at itiscuneo.eu )
+ */
 
 namespace DAO;
 
@@ -63,6 +73,7 @@ class RedisDb {
 
         $userUid = Uid::compact($userUid);
 
+        /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
         self::$instance->del("token:{$userUid}");
     }
 

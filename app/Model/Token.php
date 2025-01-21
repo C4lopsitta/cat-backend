@@ -1,7 +1,17 @@
 <?php
+/*
+ * Copyright (c) 2025.
+ *
+ * Code is licensed under GNU GPLv3 License and available in the Copying file.
+ * Code was written by:
+ * - Simone Robaldo ( simone.robaldo at itiscuneo.eu )
+ * - Giulia Vadelli ( giulia.vadelli at itiscuneo.eu )
+ * - Daniele Torchio ( daniele.torchio at itiscuneo.eu )
+ */
 
 namespace Model;
 
+use Random\RandomException;
 use Utilities\Uid;
 
 /**
@@ -17,7 +27,7 @@ class Token
      * Generates a new User token from the User UID and give an optional duration
      * @param string $userUID
      * @param int $durationSecs
-     * @throws \Random\RandomException
+     * @throws RandomException
      * @return Token
      */
     static function generate(string $userUID, int $durationSecs = 3600): Token {

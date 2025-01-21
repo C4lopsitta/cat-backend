@@ -1,4 +1,13 @@
 <?php
+/*
+ * Copyright (c) 2025.
+ *
+ * Code is licensed under GNU GPLv3 License and available in the Copying file.
+ * Code was written by:
+ * - Simone Robaldo ( simone.robaldo at itiscuneo.eu )
+ * - Giulia Vadelli ( giulia.vadelli at itiscuneo.eu )
+ * - Daniele Torchio ( daniele.torchio at itiscuneo.eu )
+ */
 
 use DAO\RedisDb;
 use Model\Token;
@@ -15,9 +24,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET") {
 
         RedisDb::connect();
         RedisDb::storeTestingToken($localAuthToken->getToken());
-    } catch (RandomException $e) {
-        echo $e->getMessage();
-    } catch (Exception $e) {
+    } catch (RandomException|Exception $e) {
         echo $e->getMessage();
     }
 }

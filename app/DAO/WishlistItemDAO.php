@@ -1,4 +1,13 @@
 <?php
+/*
+ * Copyright (c) 2025.
+ *
+ * Code is licensed under GNU GPLv3 License and available in the Copying file.
+ * Code was written by:
+ * - Simone Robaldo ( simone.robaldo at itiscuneo.eu )
+ * - Giulia Vadelli ( giulia.vadelli at itiscuneo.eu )
+ * - Daniele Torchio ( daniele.torchio at itiscuneo.eu )
+ */
 
 namespace DAO;
 
@@ -38,7 +47,7 @@ class WishlistItemDAO extends GenericDAO
     /**
      * @throws Exception
      */
-    public static function read(int $id): ?object
+    public static function read(string $id): ?object
     {
         throw new Exception('Not implemented');
     }
@@ -77,7 +86,7 @@ class WishlistItemDAO extends GenericDAO
         throw new Exception('Not implemented');
     }
 
-    public static function delete(int $id): bool
+    public static function delete(string $id): bool
     {
         $sql = "DELETE FROM wishListItems 
                         WHERE wishListItems.uid = :id;";

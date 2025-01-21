@@ -1,4 +1,19 @@
-<?php
+<?php /** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
+
+/*
+ * Copyright (c) 2025.
+ *
+ * Code is licensed under GNU GPLv3 License and available in the Copying file.
+ * Code was written by:
+ * - Simone Robaldo ( simone.robaldo at itiscuneo.eu )
+ * - Giulia Vadelli ( giulia.vadelli at itiscuneo.eu )
+ * - Daniele Torchio ( daniele.torchio at itiscuneo.eu )
+ */
 
 namespace Jsons;
 
@@ -34,6 +49,9 @@ JSON;
     }
 
     static function userRegistrationResponse(string $username, string $email, string $uid): string {
+        /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+        /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+        /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
         return <<< JSON
 {
   "username": "{$username}",
@@ -45,6 +63,7 @@ JSON;
     }
 
     public static function userExistsResponse(string $email) {
+        /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
         return <<< JSON
 {
   "error": "User already exists",
@@ -55,6 +74,8 @@ JSON;
     }
 
     public static function newUserTokenResponse(string $uid, string $token, int $expiresIn) {
+        /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
+        /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
         return <<< JSON
 {
   "uid": "{$uid}",

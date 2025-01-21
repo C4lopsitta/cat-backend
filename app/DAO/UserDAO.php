@@ -1,4 +1,16 @@
-<?php
+<?php /** @noinspection ALL */
+/** @noinspection ALL */
+/** @noinspection ALL */
+
+/*
+ * Copyright (c) 2025.
+ *
+ * Code is licensed under GNU GPLv3 License and available in the Copying file.
+ * Code was written by:
+ * - Simone Robaldo ( simone.robaldo at itiscuneo.eu )
+ * - Giulia Vadelli ( giulia.vadelli at itiscuneo.eu )
+ * - Daniele Torchio ( daniele.torchio at itiscuneo.eu )
+ */
 
 namespace DAO;
 
@@ -32,6 +44,7 @@ class UserDAO extends GenericDAO
 
     public static function read(string $id): ?object {
         $id = Uid::compact($id);
+        /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
         $sql = "SELECT * FROM users WHERE users.uid LIKE '{$id}';";
         $stmt = self::$pdo->prepare($sql);
         $stmt->execute();
@@ -46,6 +59,7 @@ class UserDAO extends GenericDAO
     }
 
     public static function fetchUserUidFromEmail(string $email): ?string {
+        /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
         $sql = "SELECT uid FROM users WHERE email='{$email}';";
         $stmt = self::$pdo->prepare($sql);
         $stmt->execute();
@@ -61,6 +75,7 @@ class UserDAO extends GenericDAO
 
 
     public static function doesUserExist(string $email): bool {
+        /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
         $sql = "SELECT * FROM users WHERE email LIKE '{$email}';";
         $stmt = self::$pdo->prepare($sql);
         $stmt->execute();

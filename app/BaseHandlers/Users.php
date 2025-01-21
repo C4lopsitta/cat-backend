@@ -1,10 +1,20 @@
 <?php
+/*
+ * Copyright (c) 2025.
+ *
+ * Code is licensed under GNU GPLv3 License and available in the Copying file.
+ * Code was written by:
+ * - Simone Robaldo ( simone.robaldo at itiscuneo.eu )
+ * - Giulia Vadelli ( giulia.vadelli at itiscuneo.eu )
+ * - Daniele Torchio ( daniele.torchio at itiscuneo.eu )
+ */
 
 namespace BaseHandlers;
 
 use DAO\GenericDAO;
 use DAO\RedisDb;
 use DAO\UserDAO;
+use Exception;
 use Model\Token;
 use Model\User;
 use Utilities\CommonJsons;
@@ -26,7 +36,7 @@ class Users {
                     GenericDAO::connect();
                     $users = UserDAO::readAll();
                     GenericDAO::disconnect();
-                } catch (\Exception $ex) {
+                } catch (Exception $ex) {
                     http_response_code(500);
                     echo CommonJsons::ServerError($ex);
                     return;
@@ -126,7 +136,7 @@ class Users {
                 error_log("Created user with UID " . $user->getUid());
 
                 GenericDAO::disconnect();
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 if($ex->getCode() == 23000) {
                    http_response_code(401);
                    echo \Jsons\Users::userExistsResponse($email);
@@ -142,7 +152,7 @@ class Users {
             try {
                 RedisDb::connect();
                 $confirmationIdToken = RedisDb::generateAndStoreAccountConfirmToken($user->getUid());
-            } catch(\Exception $ex) {
+            } catch(Exception $ex) {
                 http_response_code(500);
                 echo CommonJsons::ServerError($ex);
                 UserDAO::delete($user->getUid());
@@ -156,14 +166,14 @@ class Users {
                    subject: "Kittens - Confirm your Account",
                    emailDest: $email
                 );
-            } catch (\Exception $ex) {
+            } catch (Exception $ex) {
                 http_response_code(500);
                 echo CommonJsons::ServerError($ex);
                 try {
                     UserDAO::connect();
                     UserDAO::delete($user->getUid());
                     UserDAO::disconnect();
-                } catch (\Exception $ex) {
+                } catch (Exception $ex) {
                     echo $ex->getMessage();
                 }
                 return;
@@ -191,7 +201,7 @@ class Users {
 
             try {
                 RedisDb::connect();
-            } catch(\Exception $ex) {
+            } catch(Exception $ex) {
                 http_response_code(500);
                 echo CommonJsons::ServerError($ex);
                 return;
@@ -212,7 +222,7 @@ class Users {
                     GenericDAO::disconnect();
 
                     if($user == null) {
-                        throw new \Exception("User does not exist");
+                        throw new Exception("User does not exist");
                     }
 
                     if($user->isAccountConfirmed()) {
@@ -231,7 +241,7 @@ class Users {
 
                     echo \Jsons\Users::newUserTokenResponse($user->getUid(), $newUserToken->getToken(), 3600);
 
-                } catch (\Exception $ex) {
+                } catch (Exception $ex) {
                     http_response_code(500);
                     error_log("Exception thrown in Users::validateAccount()\n--- TRACE ---\n{$ex->getMessage()}\n");
                     error_log($ex);
@@ -282,7 +292,7 @@ class Users {
                 }
 
                 GenericDAO::disconnect();
-            } catch(\Exception $ex) {
+            } catch(Exception $ex) {
                 http_response_code(500);
                 error_log("Server Error on /api/v1/cats/authenticate.\n--- TRACE ---\n{$ex->getTrace()}\n");
                 echo CommonJsons::ServerError($ex);

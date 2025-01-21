@@ -1,4 +1,13 @@
 <?php
+/*
+ * Copyright (c) 2025.
+ *
+ * Code is licensed under GNU GPLv3 License and available in the Copying file.
+ * Code was written by:
+ * - Simone Robaldo ( simone.robaldo at itiscuneo.eu )
+ * - Giulia Vadelli ( giulia.vadelli at itiscuneo.eu )
+ * - Daniele Torchio ( daniele.torchio at itiscuneo.eu )
+ */
 
 namespace DAO;
 
@@ -50,7 +59,7 @@ class CatDAO extends GenericDAO
 
     }
 
-    public static function read(int $id): ?object
+    public static function read(string $id): ?object
     {
         $sql = "SELECT * FROM cats WHERE cats.uid = :id;";
         $stmt = self::$pdo->prepare($sql);
@@ -136,7 +145,7 @@ class CatDAO extends GenericDAO
         ]);
     }
 
-    public static function delete(int $id): bool
+    public static function delete(string $id): bool
     {
         $sql = "DELETE FROM cats WHERE cats.uid = :id;";
         $stmt = self::$pdo->prepare($sql);
