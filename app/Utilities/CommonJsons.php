@@ -35,7 +35,8 @@ JSON;
 JSON;
 
   static function BadRequest(array $fieldErrors = []): string {
-      $fieldErrors = join(", ", $fieldErrors);
+      $fieldErrors = join("\", \"", $fieldErrors);
+      $fieldErrors = "\"$fieldErrors\"";
       return <<< JSON
 {
   "error": "Bad Request",
@@ -50,10 +51,9 @@ JSON;
 {
   "error": "Server error",
   "exception": "{$exception->getMessage()}",
-  "thrownIn": "{$thrownIn}"
+  "thrownIn": "{$thrownIn}",
   "status": 500
 }
 JSON;
   }
-
 }

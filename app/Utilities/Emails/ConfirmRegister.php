@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Utilities\Emails;
+namespace Utilities\Emails;
 
 
 class ConfirmRegister {
-    static function html(string $username, string $baseUrl, string $confirmationUid): string {
+    static function html(string $username, string $baseUrl, string $confirmationUid, string $userUid): string {
         return <<< HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -31,7 +31,7 @@ class ConfirmRegister {
         <table style="width: 100%; margin: 32px 0;">
             <tr>
                 <td align="center" valign="middle">
-                    <a href="{$baseUrl}?confirmationId={$confirmationUid}"
+                    <a href="{$baseUrl}?confirmationId={$confirmationUid}&userUid={$userUid}"
                        style="background-color: pink; padding: 16px 32px; border-radius: 12px; color: black;">
                         Confirm Registration
                     </a>
@@ -89,9 +89,7 @@ class ConfirmRegister {
 </html>
 HTML;
     }
-
-    static function plainText(string $username, string $baseUrl, string $confirmationUid) {
-        return "Hi $username!\nOpen the following link in the browser to complete your account registration.\n$baseUrl?confirmationId=$confirmationUid";
+    static function plainText(string $username, string $baseUrl, string $confirmationUid, string $userUid): string {
+        return "Hi $username!\nOpen the following link in the browser to complete your account registration.\n$baseUrl?confirmationId=$confirmationUid&userUid=$userUid";
     }
-
 }
