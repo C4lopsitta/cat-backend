@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS users(
     uid VARCHAR(32) PRIMARY KEY,
     username VARCHAR(32) NOT NULL,
-    email VARCHAR(64) NOT NULL,
+    email VARCHAR(256) UNIQUE NOT NULL,
     image BLOB,
     imageMimeType VARCHAR(16),
     description TEXT,

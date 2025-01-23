@@ -2,7 +2,15 @@
 
 namespace BaseHandlers;
 
+use DAO\GenericDAO;
+use DAO\RedisDb;
+use DAO\UserDAO;
+use Model\Token;
+use Model\User;
 use Utilities\CommonJsons;
+use Utilities\Emails\ConfirmRegister;
+use Utilities\MailSender;
+use Utilities\Password;
 use Utilities\Regexes;
 use Utilities\Uid;
 
@@ -14,7 +22,17 @@ class Users {
                 $page = $_GET['page'] ?? null;
                 $itemsPerPage = $_GET['items'] ?? 25;
 
-                echo \Jsons\Users::listUsers(["a", "b"], $page, $itemsPerPage);
+                try {
+                    GenericDAO::connect();
+                    $users = UserDAO::readAll();
+                    GenericDAO::disconnect();
+                } catch (\Exception $ex) {
+                    http_response_code(500);
+                    echo CommonJsons::ServerError($ex);
+                    return;
+                }
+
+                echo \Jsons\Users::listUsers($users, $page, $itemsPerPage);
             } else {
                 http_response_code(405);
                 echo CommonJsons::$MethodNotAllowed;
@@ -31,6 +49,7 @@ class Users {
                 return;
             } elseif(strlen($uriParts[1]) == 32 + 4) {
                 Users::handleUidURI($uriParts);
+                return;
             } else {
                 http_response_code(404);
                 echo CommonJsons::$NotFound;
@@ -49,6 +68,10 @@ class Users {
             return;
         }elseif (Uid::verify($uriParts[1])) {
             if (sizeof($uriParts) == 3) {
+                if ($uriParts[2] == "validate") {
+                    self::validateAccount($uriParts);
+                    return;
+                }
                 // uid + some action
                 return;
             }else {
@@ -72,9 +95,10 @@ class Users {
 
             $fieldErrors = [];
 
-            if($email == null || !preg_match(Regexes::$Email, $email)) { $fieldErrors[] = "email"; }
-            if($password == null || !preg_match(Regexes::$Password, $password)) { $fieldErrors[] = "password"; }
-            if($username == null || !preg_match(Regexes::$Username, $username)) { $fieldErrors[] = "username"; }
+            // TODO)) Fix regexp
+//            if($email == null || !preg_match(Regexes::$Email, $email)) { $fieldErrors[] = "email"; }
+//            if($password == null || !preg_match(Regexes::$Password, $password)) { $fieldErrors[] = "password"; }
+//            if($username == null || !preg_match(Regexes::$Username, $username)) { $fieldErrors[] = "username"; }
 
             if(sizeof($fieldErrors) > 0) {
                 http_response_code(400);
@@ -82,14 +106,142 @@ class Users {
                 return;
             }
 
-            // TODO)) Add email_already_in_use error
-            if(false) {
-                http_response_code(401);
-                echo "todo response email in use";
+            $passwordHash = Password::hash($password);
+
+            $user = new User(
+               username: $username,
+               uid: "",
+               email: $email,
+               image: null,
+               imageMimeType: null,
+               description: $description,
+               pronouns: $pronouns,
+               passwordHash: $passwordHash
+            );
+
+            try {
+                GenericDAO::connect();
+                UserDAO::create($user);
+
+                error_log("Created user with UID " . $user->getUid());
+
+                GenericDAO::disconnect();
+            } catch (\Exception $ex) {
+                if($ex->getCode() == 23000) {
+                   http_response_code(401);
+                   echo \Jsons\Users::userExistsResponse($email);
+                } else {
+                    http_response_code(500);
+                    echo CommonJsons::ServerError($ex);
+                }
                 return;
             }
 
-            $emailConfirmationBaseUrl = $reqJson['emailConfirmationBaseUrl'] ?? null;
+            $emailConfirmationBaseUrl = $reqJson['emailConfirmationBaseUrl'] ?? "http://" . getenv("SERVER_ADDRESS") . "/api/v1/users/". Uid::format($user->getUid()) . "/validate";
+
+            try {
+                RedisDb::connect();
+                $confirmationIdToken = RedisDb::generateAndStoreAccountConfirmToken($user->getUid());
+            } catch(\Exception $ex) {
+                http_response_code(500);
+                echo CommonJsons::ServerError($ex);
+                UserDAO::delete($user->getUid());
+                return;
+            }
+
+            try {
+                MailSender::send(
+                   html: ConfirmRegister::html($username, $emailConfirmationBaseUrl, $confirmationIdToken, $user->getUid()),
+                   text: ConfirmRegister::plainText($username, $emailConfirmationBaseUrl, $confirmationIdToken, $user->getUid()),
+                   subject: "Kittens - Confirm your Account",
+                   emailDest: $email
+                );
+            } catch (\Exception $ex) {
+                http_response_code(500);
+                echo CommonJsons::ServerError($ex);
+                try {
+                    UserDAO::connect();
+                    UserDAO::delete($user->getUid());
+                    UserDAO::disconnect();
+                } catch (\Exception $ex) {
+                    echo $ex->getMessage();
+                }
+                return;
+            }
+
+            echo \Jsons\Users::userRegistrationResponse(username: $username, email: $email, uid: Uid::format($user->getUid()));
+        } else {
+            http_response_code(405);
+            echo CommonJsons::$MethodNotAllowed;
+        }
+    }
+
+    private static function validateAccount(array $uriParts): void {
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $json = json_decode(file_get_contents('php://input'), true);
+
+            $userUid = $uriParts[1];
+            $confirmationId = $json['confirmationId'] ?? null;
+
+            if($confirmationId == null) {
+                http_response_code(400);
+                echo CommonJsons::BadRequest(["confirmationId"]);
+                return;
+            }
+
+            try {
+                RedisDb::connect();
+            } catch(\Exception $ex) {
+                http_response_code(500);
+                echo CommonJsons::ServerError($ex);
+                return;
+            }
+
+            $redisUserUid = RedisDb::verifyAccountConfirmToken($confirmationId);
+
+            if($redisUserUid == null || strlen($redisUserUid) < 1) {
+                http_response_code(401);
+                echo \Jsons\Users::$tokenExpiredOrUsed;
+                return;
+            }
+
+            if(Uid::compact($redisUserUid) == Uid::compact($userUid)) {
+                try {
+                    GenericDAO::connect();
+                    $user = UserDAO::read($redisUserUid);
+                    GenericDAO::disconnect();
+
+                    if($user == null) {
+                        throw new \Exception("User does not exist");
+                    }
+
+                    if($user->isAccountConfirmed()) {
+                        http_response_code(208);
+                        RedisDb::invalidateUserTokens($user->getUid());
+                    }
+
+                    $newUserToken = Token::generate($user->getUid());
+
+                    RedisDb::storeUserToken($newUserToken->getToken(), $user->getUid());
+
+                    $user->setIsAccountConfirmed(true);
+                    GenericDAO::connect();
+                    UserDAO::update($user);
+                    GenericDAO::disconnect();
+
+                    echo \Jsons\Users::newUserTokenResponse($user->getUid(), $newUserToken->getToken(), 3600);
+
+                } catch (\Exception $ex) {
+                    http_response_code(500);
+                    error_log("Exception thrown in Users::validateAccount()\n--- TRACE ---\n{$ex->getMessage()}\n");
+                    error_log($ex);
+                    echo CommonJsons::ServerError($ex);
+                    return;
+                }
+            } else {
+                http_response_code(400);
+                echo CommonJsons::BadRequest(["confirmationId"]);
+            }
         } else {
             http_response_code(405);
             echo CommonJsons::$MethodNotAllowed;
@@ -97,6 +249,48 @@ class Users {
     }
 
     private static function handleAuthenticate(array $uriParts): void {
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $json = json_decode(file_get_contents('php://input'), true);
 
+            try {
+                GenericDAO::connect();
+                RedisDb::connect();
+
+                if(!UserDAO::doesUserExist($json['email'])) {
+                    http_response_code(400);
+                    echo CommonJsons::BadRequest(["email"]);
+                    GenericDAO::disconnect();
+                    return;
+                }
+
+                $userUid = UserDAO::fetchUserUidFromEmail($json['email']);
+                $password = $json['password'];
+
+                $user = UserDAO::read($userUid);
+
+                if(Password::verify($password, $user->getPasswordHash())) {
+                    // generate token
+                    $token = Token::generate($user->getUid());
+                    RedisDb::storeUserToken($token->getToken(), $user->getUid());
+
+                    echo \Jsons\Users::newUserTokenResponse($user->getUid(), $token->getToken(), 3600);
+                } else {
+                    http_response_code(400);
+                    echo CommonJsons::BadRequest(["email"]);
+                    GenericDAO::disconnect();
+                    return;
+                }
+
+                GenericDAO::disconnect();
+            } catch(\Exception $ex) {
+                http_response_code(500);
+                error_log("Server Error on /api/v1/cats/authenticate.\n--- TRACE ---\n{$ex->getTrace()}\n");
+                echo CommonJsons::ServerError($ex);
+                return;
+            }
+        } else {
+            http_response_code(405);
+            echo CommonJsons::$MethodNotAllowed;
+        }
     }
 }

@@ -9,6 +9,17 @@ services:
       - "3307:3306"
     networks:
       - catnet
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.2.7-alpine3.21
+    volumes:
+      - ./redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - catnet
 
   catapi:
     image: nginx:alpine
@@ -19,6 +30,7 @@ services:
       - catnet
     env_file:
       - nginx.env
+    restart: unless-stopped
     ports:
       - "80:80"
     depends_on:
@@ -36,6 +48,10 @@ services:
       - nginx.env
     expose:
       - 9000
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - db
 
 networks:
   catnet:
