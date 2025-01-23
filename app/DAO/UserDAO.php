@@ -113,4 +113,32 @@ class UserDAO extends GenericDAO
         $stmt = self::$pdo->prepare($sql);
         return $stmt->execute([':id' => $id]);
     }
+
+    public static function storeUserSecret(string $userUID, string $secret): bool {
+        $user = self::read($userUID);
+        $sql = "UPDATE users SET
+            key2FA = :key2FA
+            WHERE users.uid LIKE :id;
+    ";
+        $stmt = self::$pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':key2FA' => $user->getKey2FA(),
+            ':id' => $user->getUid()
+        ]);
+    }
+
+    public static function readTFA(string $uid): ?string {
+        $sql = "SELECT key2FA FROM users WHERE uid = :id";
+        $stmt = self::$pdo->prepare($sql);
+
+        $stmt->execute([
+            ':id' => $uid
+        ]);
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result ? $result['key2FA'] : null;
+    }
+
 }

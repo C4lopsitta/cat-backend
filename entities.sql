@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users(
     pronouns VARCHAR(32),
     passwordHash TEXT NOT NULL,
     isAccountConfirmed BOOLEAN NOT NULL DEFAULT FALSE,
-    key2FA VARCHAR(32)
+    key2FA VARCHAR(32) DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS cats(
