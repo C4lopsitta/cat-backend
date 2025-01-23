@@ -15,8 +15,8 @@ class User
     private ?string $key2FA;
 
     /**
-     * @param string $uid
      * @param string $username
+     * @param string $uid
      * @param string $email
      * @param string|null $image
      * @param string|null $imageMimeType
@@ -25,9 +25,9 @@ class User
      * @param string $passwordHash
      * @param bool $isAccountConfirmed
      */
-    public function __construct(string $uid, string $username, string $email, ?string $image, ?string $imageMimeType, ?string $description, ?string $pronouns, string $passwordHash, bool $isAccountConfirmed) {
-        $this->uid = $uid;
+    public function __construct(string $username,string $uid, string $email, ?string $image, ?string $imageMimeType, ?string $description, ?string $pronouns, string $passwordHash, bool $isAccountConfirmed) {
         $this->username = $username;
+        $this->uid = $uid;
         $this->email = $email;
         $this->image = $image;
         $this->imageMimeType = $imageMimeType;
