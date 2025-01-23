@@ -15,6 +15,7 @@ use DAO\GenericDAO;
 use DAO\RedisDb;
 use DAO\UserDAO;
 use Exception;
+use Exceptions\UnauthorizedException;
 use Model\Token;
 use Model\User;
 use Utilities\CommonJsons;
@@ -108,9 +109,64 @@ class Users {
                         }
                         break;
                     case 'PUT':
+                        $json = json_decode(file_get_contents('php://input'), true);
 
+                        try {
+                            $bearerToken = Token::getTokenFromHeader();
+                            RedisDb::connect();
+                            RedisDb::validateUserToken($bearerToken, $uriParts[1]);
+                        } catch (UnauthorizedException $ex) {
+                            http_response_code(401);
+                            echo CommonJsons::$Unauthorized;
+                            return;
+                        } catch (Exception $ex) {
+                            http_response_code(500);
+                            echo CommonJsons::ServerError($ex);
+                            return;
+                        }
+
+                        try {
+                            GenericDAO::connect();
+                            $user = UserDAO::read($uriParts[1]);
+
+                            if(array_key_exists('description', $json)) {
+                                $user->setDescription($json['description']);
+                            }
+                            if(array_key_exists('pronouns', $json)) {
+                                $user->setPronouns($json['pronouns']);
+                            }
+                            if(array_key_exists('image', $json)) {
+                                $user->setImage($json['image']);
+                            }
+                            if(array_key_exists('image_mime', $json)) {
+                                $user->setImageMimeType($json['image_mime']);
+                            }
+
+                            UserDAO::update($user);
+                            GenericDAO::disconnect();
+                        } catch (Exception $ex) {
+                            GenericDAO::disconnect();
+                            http_response_code(500);
+                            echo CommonJsons::ServerError($ex);
+                            return;
+                        }
+
+                        echo \Jsons\Users::user($user);
                         break;
                     case 'DELETE':
+                        try {
+                            $bearerToken = Token::getTokenFromHeader();
+                            RedisDb::connect();
+                            RedisDb::validateUserToken($bearerToken, $uriParts[1]);
+                        } catch (UnauthorizedException $ex) {
+                            http_response_code(401);
+                            echo CommonJsons::$Unauthorized;
+                            return;
+                        } catch (Exception $ex) {
+                            http_response_code(500);
+                            echo CommonJsons::ServerError($ex);
+                            return;
+                        }
 
                         break;
                     default:

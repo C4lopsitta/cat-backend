@@ -52,9 +52,9 @@ class UserDAO extends GenericDAO
     public static function read(string $id): ?object {
         $id = Uid::compact($id);
         /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-        $sql = "SELECT * FROM users WHERE users.uid LIKE '{$id}';";
+        $sql = "SELECT * FROM users WHERE users.uid LIKE :uid;";
         $stmt = self::$pdo->prepare($sql);
-        $stmt->execute();
+        $stmt->execute(['uid' => $id]);
 
         $data = $stmt->fetch(PDO::FETCH_OBJ);
         if ($data) {
@@ -92,7 +92,7 @@ class UserDAO extends GenericDAO
     }
 
     public static function readAll(): ?array {
-        $sql = "SELECT * FROM users;";
+        $sql = "SELECT * FROM users WHERE isAccountConfirmed = true;";
 
         $resultSet = self::$pdo->query($sql);
         $results = $resultSet->fetchAll();

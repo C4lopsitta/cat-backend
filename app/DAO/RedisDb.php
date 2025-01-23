@@ -1,4 +1,4 @@
-<?php /** @noinspection ALL */
+<?php
 
 /*
  * Copyright (c) 2025.
@@ -13,6 +13,7 @@
 namespace DAO;
 
 use Exception;
+use Exceptions\UnauthorizedException;
 use http\Exception\BadMessageException;
 use Redis;
 use RedisException;
@@ -45,7 +46,10 @@ class RedisDb {
         self::$instance->setex('token:'.$token, 3600, $userUid);
     }
 
-    static public function validateUserToken(string $token, string $userUid): bool {
+    /**
+     * @throws UnauthorizedException
+     */
+    static public function validateUserToken(string $token, string $userUid): void {
         if(!self::$instance) {
             throw new RedisException("RedisDb connection not established");
         }
@@ -55,15 +59,15 @@ class RedisDb {
         $redisUserUid = self::$instance->get("token:$token");
         $redisUserUid = Uid::compact($redisUserUid);
 
-        if(!$userUid) {
-            throw new BadMessageException("User token not found");
+        if(!$redisUserUid) {
+            throw new UnauthorizedException("User token not found");
         }
 
         if(strcmp($redisUserUid, $userUid) == 0) {
-            return true;
+            return;
         }
 
-        return false;
+        throw new UnauthorizedException("Token validtion failed");
     }
 
     static public function invalidateUserTokens(string $userUid) {

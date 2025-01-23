@@ -45,6 +45,13 @@ JSON;
 }
 JSON;
 
+  static string $Unauthorized = <<< JSON
+{
+  "error": "Unauthorized",
+  "status": 401
+}
+JSON;
+
   static function BadRequest(array $fieldErrors = []): string {
       $fieldErrors = join("\", \"", $fieldErrors);
       $fieldErrors = "\"$fieldErrors\"";

@@ -11,6 +11,7 @@
 
 namespace Model;
 
+use Exceptions\UnauthorizedException;
 use Random\RandomException;
 use Utilities\Uid;
 
@@ -39,6 +40,23 @@ class Token
         }
 
         return new self($token, $expiresAt, $userUID);
+    }
+
+    /**
+     * @throws UnauthorizedException
+     */
+    static function getTokenFromHeader(): string {
+        if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+        } elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+            $authHeader = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+        }
+
+        if (isset($authHeader) && preg_match('/[Bb]earer\s(\S+)/', $authHeader, $matches)) {
+            return $matches[1];
+        } else {
+            throw new UnauthorizedException("No token provided");
+        }
     }
 
     /**
