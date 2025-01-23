@@ -6,3 +6,7 @@ nginx.env
 ./redis_data
 ./app/vendor/composer
 ./app/vendor/phpmailer
+db_data/
+redis_data/
+app/composer.lock
+app/vendor/

@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM arm32v7/php:8.2-fpm
 
 RUN docker-php-ext-install pdo mysqli pdo_mysql
 COPY app/ /var/www/html/
@@ -14,8 +14,6 @@ RUN rm -rf /var/lib/apt/lists/*
 RUN pecl install --onlyreqdeps --force redis \
 && rm -rf /tmp/pear \
 && docker-php-ext-enable redis
-
-RUN pecl install redis
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
