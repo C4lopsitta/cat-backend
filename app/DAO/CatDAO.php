@@ -9,7 +9,7 @@ use DAO\GenericDAO;
 
 use PDO;
 
-class CatDAO extends GenericDAO
+class  CatDAO extends GenericDAO
 {
 
     /**

@@ -24,9 +24,8 @@ class User
      * @param string|null $pronouns
      * @param string $passwordHash
      * @param bool $isAccountConfirmed
-     * @param string $key2FA
      */
-    public function __construct(string $uid, string $username, string $email, ?string $image, ?string $imageMimeType, ?string $description, ?string $pronouns, string $passwordHash, bool $isAccountConfirmed, string $key2FA) {
+    public function __construct(string $uid, string $username, string $email, ?string $image, ?string $imageMimeType, ?string $description, ?string $pronouns, string $passwordHash, bool $isAccountConfirmed) {
         $this->uid = $uid;
         $this->username = $username;
         $this->email = $email;
@@ -36,7 +35,6 @@ class User
         $this->pronouns = $pronouns;
         $this->passwordHash = $passwordHash;
         $this->isAccountConfirmed = $isAccountConfirmed;
-        $this->key2FA = $key2FA;
     }
 
     public function getUid(): string {

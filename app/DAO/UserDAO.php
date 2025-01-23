@@ -129,7 +129,7 @@ class UserDAO extends GenericDAO
     }
 
     public static function readTFA(string $uid): ?string {
-        $sql = "SELECT key2FA FROM users WHERE uid = :id";
+        $sql = "SELECT key2FA FROM users WHERE uid LIKE :id";
         $stmt = self::$pdo->prepare($sql);
 
         $stmt->execute([

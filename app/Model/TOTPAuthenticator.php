@@ -17,8 +17,7 @@ class TOTPAuthenticator {
         );
     }
 
-    private function activate2FA(string $userUID): string
-    {
+    private function activate2FA(string $userUID): string {
         $secret = $this->tfa->createSecret();
 
         UserDAO::storeUserSecret($userUID, $secret);
@@ -34,8 +33,7 @@ class TOTPAuthenticator {
         $this->tfa = $tfa;
     }
 
-    public function verifyCode(string $userUID, string $userInputCode): bool
-    {
+    public function verifyCode(string $userUID, string $userInputCode): bool {
         $secret = UserDAO::readTFA($userUID);
         return $this->tfa->verifyCode($secret, $userInputCode);
     }
@@ -47,7 +45,7 @@ class TOTPAuthenticator {
         return $code;
     }
 
-    private function generateQRCode(string $userUID): string{
+    private function generateQRCode(string $userUID): string {
         $secret = UserDAO::readTFA($userUID);
         $qrCode = $this->tfa->getQRCodeImageAsDataUri($secret);
          return $qrCode;
