@@ -38,43 +38,4 @@ JSON;
   "status": 400
 }
 JSON;
-
-  static string $MethodNotAllowed = <<< JSON
-{
-  "error": "Method not allowed",
-  "status": 405
-}
-JSON;
-
-  static string $Unauthorized = <<< JSON
-{
-  "error": "Unauthorized",
-  "status": 401
-}
-JSON;
-
-  static function BadRequest(array $fieldErrors = []): string {
-      $fieldErrors = join("\", \"", $fieldErrors);
-      $fieldErrors = "\"$fieldErrors\"";
-      /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-      return <<< JSON
-{
-  "error": "Bad Request",
-  "fieldErrors": [{$fieldErrors}],
-  "status": 400
-}
-JSON;
-  }
-
-  static function ServerError(Exception $exception, string $thrownIn = ""): string {
-      /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-      return <<< JSON
-{
-  "error": "Server error",
-  "exception": "{$exception->getMessage()}",
-  "thrownIn": "{$thrownIn}",
-  "status": 500
-}
-JSON;
-  }
 }

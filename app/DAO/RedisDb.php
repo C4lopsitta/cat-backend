@@ -12,6 +12,7 @@
 
 namespace DAO;
 
+use Enums\UnauthorizedReason;
 use Exception;
 use Exceptions\UnauthorizedException;
 use http\Exception\BadMessageException;
@@ -60,17 +61,17 @@ class RedisDb {
         $redisUserUid = Uid::compact($redisUserUid);
 
         if(!$redisUserUid) {
-            throw new UnauthorizedException("User token not found");
+            throw new UnauthorizedException(UnauthorizedReason::INVALID_TOKEN);
         }
 
         if(strcmp($redisUserUid, $userUid) == 0) {
             return;
         }
 
-        throw new UnauthorizedException("Token validtion failed");
+        throw new UnauthorizedException(UnauthorizedReason::INVALID_TOKEN);
     }
 
-    static public function invalidateUserTokens(string $userUid) {
+    static public function invalidateUserTokens(string $userUid): void {
         if(self::$instance == null) {
             throw new RedisException('Redis connection not established');
         }

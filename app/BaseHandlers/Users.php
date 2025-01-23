@@ -26,7 +26,6 @@ use Exceptions\UserAlreadyExistsException;
 use Exceptions\UserNotVerifiedException;
 use Model\Token;
 use Model\User;
-use Utilities\CommonJsons;
 use Utilities\Emails\ConfirmRegister;
 use Utilities\MailSender;
 use Utilities\Password;

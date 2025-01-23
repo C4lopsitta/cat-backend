@@ -13,7 +13,15 @@ require "vendor/autoload.php";
 
 use BaseHandlers\Cats;
 use BaseHandlers\Users;
+use Enums\NotFoundReason;
+use Exceptions\BadRequestException;
 use Exceptions\BaseApiException;
+use Exceptions\MethodNotAllowedException;
+use Exceptions\NotFoundException;
+use Exceptions\ServerException;
+use Exceptions\UnauthorizedException;
+use Exceptions\UserAlreadyExistsException;
+use Exceptions\UserNotVerifiedException;
 use Utilities\CommonJsons;
 
 ini_set('display_errors', 0);
@@ -67,6 +75,24 @@ $uriParts = explode("/", $uri);
 header("Content-type: application/json");
 // [INFO] Switch the base part of the URI
 
+/**
+ * @throws UnauthorizedException
+ * @throws NotFoundException
+ * @throws ServerException
+ * @throws UserAlreadyExistsException
+ * @throws UserNotVerifiedException
+ * @throws BadRequestException
+ * @throws MethodNotAllowedException
+ */
+function handleRequest(array $uriParts): string {
+    return match($uriParts[0]) {
+        "cats" => Cats::handler($uriParts),
+        "users" => Users::handler($uriParts),
+        "info" => CommonJsons::$Info,
+        default => throw new NotFoundException(NotFoundReason::PATH_NOT_FOUND)
+    };
+}
+
 try {
     switch ($uriParts[0]) {
         case "users":
@@ -79,8 +105,7 @@ try {
             echo CommonJsons::$Info;
             break;
         default:
-            echo CommonJsons::$NotFound;
-            break;
+            throw new NotFoundException(NotFoundReason::PATH_NOT_FOUND);
     }
 } catch (BaseApiException $ex) {
     http_response_code($ex::$HTTP_STATUS_CODE);
