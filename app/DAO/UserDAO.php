@@ -65,6 +65,17 @@ class UserDAO extends GenericDAO
         return null;
     }
 
+    public static function isUserAccountConfirmed(string $uid): bool {
+        $sql = "SELECT * FROM users WHERE users.uid = :uid AND isAccountConfirmed = true;";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute(['uid' => $uid]);
+
+        if ($stmt->rowCount() > 0) {
+            return true;
+        }
+        return false;
+    }
+
     public static function fetchUserUidFromEmail(string $email): ?string {
         /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
         $sql = "SELECT uid FROM users WHERE email= :email;";
@@ -131,6 +142,7 @@ class UserDAO extends GenericDAO
     }
 
     public static function delete(string $id): bool {
+        $id = Uid::compact($id);
         $sql = "DELETE FROM users WHERE users.uid = :id;";
         $stmt = self::$pdo->prepare($sql);
         return $stmt->execute([':id' => $id]);

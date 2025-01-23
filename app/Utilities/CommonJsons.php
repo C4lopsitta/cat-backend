@@ -16,7 +16,8 @@ namespace Utilities;
 
 use Exception;
 
-class CommonJsons {
+class
+CommonJsons {
   static string $Info = <<< JSON
 {
   "version": "1",

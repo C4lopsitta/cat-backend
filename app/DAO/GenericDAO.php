@@ -25,7 +25,7 @@ abstract class GenericDAO {
     return true;
   }
 
-  public static function disconnect() {
+  public static function disconnect(): void {
     self::$pdo = null;
   }
 

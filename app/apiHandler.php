@@ -13,6 +13,7 @@ require "vendor/autoload.php";
 
 use BaseHandlers\Cats;
 use BaseHandlers\Users;
+use Exceptions\BaseApiException;
 use Utilities\CommonJsons;
 
 ini_set('display_errors', 0);
@@ -66,19 +67,24 @@ $uriParts = explode("/", $uri);
 header("Content-type: application/json");
 // [INFO] Switch the base part of the URI
 
-switch ($uriParts[0]) {
-  case "users":
-      Users::handler($uriParts);
-      break;
-  case "cats":
-      Cats::handler($uriParts);
-      break;
-  case "info":
-      echo CommonJsons::$Info;
-      break;
-  default:
-      echo CommonJsons::$NotFound;
-      break;
+try {
+    switch ($uriParts[0]) {
+        case "users":
+            echo Users::handler($uriParts);
+            break;
+        case "cats":
+            Cats::handler($uriParts);
+            break;
+        case "info":
+            echo CommonJsons::$Info;
+            break;
+        default:
+            echo CommonJsons::$NotFound;
+            break;
+    }
+} catch (BaseApiException $ex) {
+    http_response_code($ex::$HTTP_STATUS_CODE);
+    error_log($ex->toLog());
+    echo $ex->toJson();
 }
-
 

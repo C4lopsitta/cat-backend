@@ -11,33 +11,31 @@
 
 namespace Exceptions;
 
-use Enums\UnauthorizedReason;
-use Exception;
+use Enums\NotFoundReason;
+use Exceptions\BaseApiException;
 
-class UnauthorizedException extends BaseApiException {
-    public UnauthorizedReason $reason;
-    public static int $HTTP_STATUS_CODE = 401;
+class NotFoundException extends BaseApiException {
+    public static int $HTTP_STATUS_CODE = 404;
+    public NotFoundReason $reason;
 
-    function __construct(UnauthorizedReason $reason = UnauthorizedReason::UNDEFINED, $message = "", $code = 0, Exception $previous = null) {
+    public function __construct(NotFoundReason $reason = NotFoundReason::PATH_NOT_FOUND, $message = "", $code = 0, Exception $previous = null) {
         $this->reason = $reason;
         parent::__construct($message, $code, $previous);
     }
 
-    function toJson(): string {
+    public function toJson(): string {
         $reason = $this->reason->toReason();
 
         return <<< JSON
 {
-  "error": "Unauthorized",
-  "status": 401,
-  "reason": "{$reason}"
+  "error": {$reason},
+  "status": 404
 }
 JSON;
     }
 
     public function toLog(): string {
-        $reason = $this->reason->toReason();
         $time = date("H:i d/m/Y", time());
-        return "[INFO] Unauthorized request made for reason {$reason} at {$time}";
+        return "[INFO] Request for unknown path/cat/user made at {$time}";
     }
 }

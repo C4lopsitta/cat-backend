@@ -11,6 +11,7 @@
 
 namespace Model;
 
+use Enums\UnauthorizedReason;
 use Exceptions\UnauthorizedException;
 use Random\RandomException;
 use Utilities\Uid;
@@ -55,7 +56,7 @@ class Token
         if (isset($authHeader) && preg_match('/[Bb]earer\s(\S+)/', $authHeader, $matches)) {
             return $matches[1];
         } else {
-            throw new UnauthorizedException("No token provided");
+            throw new UnauthorizedException(UnauthorizedReason::NO_TOKEN_PROVIDED);
         }
     }
 
