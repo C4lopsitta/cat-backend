@@ -1,9 +1,4 @@
-<?php /** @noinspection ALL */
-/** @noinspection ALL */
-/** @noinspection ALL */
-/** @noinspection ALL */
-/** @noinspection ALL */
-/** @noinspection ALL */
+<?php
 
 /*
  * Copyright (c) 2025.
@@ -17,25 +12,29 @@
 
 namespace Jsons;
 
+use Model\User;
+use Utilities\Uid;
+
 class Users {
     // TODO)) Add pagination
     static function listUsers(array $users, ?int $page, int $itemsPerPage): string {
         $usersJsonList = [];
 
         foreach ($users as $user) {
+            $uid = Uid::format($user->getUid());
             $usersJsonList[] = <<< JSON
 {
-        "uid": "{$user->getUid()}",
-        "username": "{$user->getUsername()}",
-        "image": "TODO Convert image to base64",
-        "imageMime": "{$user->getImageMimeType()}",
-        "description": "{$user->getDescription()}",
-        "pronouns": "{$user->getPronouns()}",
-        "cats": [
-        ],
-        "wishlist": [
-        ]
-    }
+    "uid": "{$uid}",
+    "username": "{$user->getUsername()}",
+    "image": "",
+    "imageMime": "{$user->getImageMimeType()}",
+    "description": "{$user->getDescription()}",
+    "pronouns": "{$user->getPronouns()}",
+    "cats": [
+    ],
+    "wishlist": [
+    ]
+}
 JSON;
         }
 
@@ -48,6 +47,23 @@ JSON;
 JSON;
     }
 
+    static function user(User $user): string {
+        $uid = Uid::format($user->getUid());
+        return <<< JSON
+{
+    "uid": "{$uid}",
+    "username": "{$user->getUsername()}",
+    "image": "",
+    "imageMime": "{$user->getImageMimeType()}",
+    "description": "{$user->getDescription()}",
+    "pronouns": "{$user->getPronouns()}",
+    "cats": [
+    ],
+    "wishlist": [
+    ]
+}
+JSON;
+    }
     static function userRegistrationResponse(string $username, string $email, string $uid): string {
         /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
         /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */

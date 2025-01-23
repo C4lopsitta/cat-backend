@@ -13,24 +13,51 @@ require "vendor/autoload.php";
 
 use BaseHandlers\Cats;
 use BaseHandlers\Users;
-use Utilities\Uid;
 use Utilities\CommonJsons;
+
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
 set_error_handler(function ($severity, $message, $file, $line) {
     http_response_code(500); // Set the HTTP status code
     $json = [
-       'error' => $message,
+       'error' => "Server Error",
        'status' => 500,
     ];
 
     if(getenv("DEBUG_MODE") == "true") {
         $json["file"] = $file;
         $json["line"] = $line;
+        $json["severity"] = $severity;
+        $json["errorDetails"] = $message;
     }
 
     echo json_encode($json);
+
+
     exit; // Stop script execution after handling the error
 });
+
+register_shutdown_function(function () {
+    $error = error_get_last();
+    if ($error !== null) {
+        http_response_code(500);
+        $json = [
+            'error' => "Fatal Error",
+            'status' => 500
+        ];
+
+        if(getenv("DEBUG_MODE") == "true") {
+            $json["file"] = $error["file"];
+            $json["line"] = $error["line"];
+            $json["errorDetails"] = $error["message"];
+            $json["type"] = $error["type"];
+        }
+
+        echo json_encode($json);
+    }
+});
+
 
 $apiBase = "/api/v1/";
 $uri = str_replace($apiBase, "", $_SERVER['REQUEST_URI']);

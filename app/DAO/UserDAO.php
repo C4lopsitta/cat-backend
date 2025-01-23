@@ -31,11 +31,18 @@ class UserDAO extends GenericDAO
         $uid = Uid::compact(Uid::generate());
 
         $sql = "INSERT INTO users 
-                        VALUES(:uid, '{$object->getUsername()}', '{$object->getEmail()}', null, null, '{$object->getDescription()}', '{$object->getPronouns()}', '{$object->getPasswordHash()}', false)";
+                        VALUES(:uid, :username, :email, null, null, :description, :pronouns, :passwordHash, false)";
 
 
         $stmt = self::$pdo->prepare($sql);
-        $stmt->execute(['uid' => $uid]);
+        $stmt->execute([
+            'uid' => $uid,
+            'username' => $object->getUsername(),
+            'email' => $object->getEmail(),
+            'description' => $object->getDescription(),
+            'pronouns' => $object->getPronouns(),
+            'passwordHash' => $object->getPasswordHash(),
+        ]);
 
         $object->setUid(Uid::format($uid));
 
@@ -60,9 +67,9 @@ class UserDAO extends GenericDAO
 
     public static function fetchUserUidFromEmail(string $email): ?string {
         /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-        $sql = "SELECT uid FROM users WHERE email='{$email}';";
+        $sql = "SELECT uid FROM users WHERE email= :email;";
         $stmt = self::$pdo->prepare($sql);
-        $stmt->execute();
+        $stmt->execute(["email" => $email]);
 
         $data = $stmt->fetch(PDO::FETCH_OBJ);
 
@@ -76,9 +83,9 @@ class UserDAO extends GenericDAO
 
     public static function doesUserExist(string $email): bool {
         /** @noinspection PhpUnnecessaryCurlyVarSyntaxInspection */
-        $sql = "SELECT * FROM users WHERE email LIKE '{$email}';";
+        $sql = "SELECT * FROM users WHERE email LIKE :email;";
         $stmt = self::$pdo->prepare($sql);
-        $stmt->execute();
+        $stmt->execute(["email" => $email]);
 
         $data = $stmt->fetch(PDO::FETCH_OBJ);
         return (bool)$data;

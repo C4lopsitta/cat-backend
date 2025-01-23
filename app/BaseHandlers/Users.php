@@ -85,7 +85,38 @@ class Users {
                 // uid + some action
                 return;
             }else {
-                // only uid was given
+                $requestMethod = $_SERVER['REQUEST_METHOD'];
+                switch ($requestMethod) {
+                    case 'GET':
+                        try {
+                            GenericDAO::connect();
+                            $user = UserDAO::read($uriParts[1]);
+                            GenericDAO::disconnect();
+
+                            if($user == null) {
+                                http_response_code(404);
+                                echo CommonJsons::$NotFound;
+                                return;
+                            }
+
+                            echo \Jsons\Users::user($user);
+                            return;
+                        } catch (Exception $ex) {
+                            http_response_code(500);
+                            echo CommonJsons::ServerError($ex);
+                            return;
+                        }
+                        break;
+                    case 'PUT':
+
+                        break;
+                    case 'DELETE':
+
+                        break;
+                    default:
+                        http_response_code(405);
+                        echo CommonJsons::$MethodNotAllowed;
+                }
                 return;
             }
         }
@@ -93,6 +124,7 @@ class Users {
 
     // --- //
 
+    // region userRegistration
     private static function handleRegistration(array $uriParts): void {
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             $reqJson = json_decode(file_get_contents('php://input'), true);
@@ -303,4 +335,11 @@ class Users {
             echo CommonJsons::$MethodNotAllowed;
         }
     }
+    // endregion userRegistration
+
+    // region userRUD
+
+
+
+    // endregion userRUD
 }
