@@ -66,7 +66,7 @@ class ConfirmRegister {
         
         <div style="padding: 24px 32px;">
             <p>If the button above isn't working, copy the following link and paste it in the browser:</p>
-            <a href="{$baseUrl}?confirmationId={$confirmationUid}">{$baseUrl}?confirmationId={$confirmationUid}</a>
+            <a href="{$baseUrl}?confirmationId={$confirmationUid}">{$baseUrl}?confirmationId={$confirmationUid}&userUid={$userUid}</a>
         </div>
     </main>
     

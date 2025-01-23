@@ -217,10 +217,6 @@ class Users {
                passwordHash: $passwordHash
             );
 
-            if(strcmp(explode("@", $email)[1], "example.com") == 0 && getenv("DEBUG_MODE") == "true") {
-                $user->setIsAccountConfirmed(true);
-            }
-
             try {
                 GenericDAO::connect();
                 UserDAO::create($user);
@@ -239,38 +235,36 @@ class Users {
                 return;
             }
 
-            if($user->isAccountConfirmed() && getenv("DEBUG_MODE") == "true") {
-                $emailConfirmationBaseUrl = $reqJson['emailConfirmationBaseUrl'] ?? "http://" . getenv("SERVER_ADDRESS") . "/api/v1/users/" . Uid::format($user->getUid()) . "/validate";
+            $emailConfirmationBaseUrl = $reqJson['emailConfirmationBaseUrl'] ?? "http://" . getenv("SERVER_ADDRESS") . "/api/v1/users/" . Uid::format($user->getUid()) . "/validate";
 
+            try {
+                RedisDb::connect();
+                $confirmationIdToken = RedisDb::generateAndStoreAccountConfirmToken($user->getUid());
+            } catch (Exception $ex) {
+                http_response_code(500);
+                echo CommonJsons::ServerError($ex);
+                UserDAO::delete($user->getUid());
+                return;
+            }
+
+            try {
+                MailSender::send(
+                   html: ConfirmRegister::html($username, $emailConfirmationBaseUrl, $confirmationIdToken, $user->getUid()),
+                   text: ConfirmRegister::plainText($username, $emailConfirmationBaseUrl, $confirmationIdToken, $user->getUid()),
+                   subject: "Kittens - Confirm your Account",
+                   emailDest: $email
+                );
+            } catch (Exception $ex) {
+                http_response_code(500);
+                echo CommonJsons::ServerError($ex);
                 try {
-                    RedisDb::connect();
-                    $confirmationIdToken = RedisDb::generateAndStoreAccountConfirmToken($user->getUid());
-                } catch (Exception $ex) {
-                    http_response_code(500);
-                    echo CommonJsons::ServerError($ex);
+                    UserDAO::connect();
                     UserDAO::delete($user->getUid());
-                    return;
-                }
-
-                try {
-                    MailSender::send(
-                       html: ConfirmRegister::html($username, $emailConfirmationBaseUrl, $confirmationIdToken, $user->getUid()),
-                       text: ConfirmRegister::plainText($username, $emailConfirmationBaseUrl, $confirmationIdToken, $user->getUid()),
-                       subject: "Kittens - Confirm your Account",
-                       emailDest: $email
-                    );
+                    UserDAO::disconnect();
                 } catch (Exception $ex) {
-                    http_response_code(500);
-                    echo CommonJsons::ServerError($ex);
-                    try {
-                        UserDAO::connect();
-                        UserDAO::delete($user->getUid());
-                        UserDAO::disconnect();
-                    } catch (Exception $ex) {
-                        echo $ex->getMessage();
-                    }
-                    return;
+                    echo $ex->getMessage();
                 }
+                return;
             }
 
             echo \Jsons\Users::userRegistrationResponse(username: $username, email: $email, uid: Uid::format($user->getUid()));
