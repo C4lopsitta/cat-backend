@@ -55,7 +55,7 @@ class Users {
                 self::handleRegistration($uriParts);
             } elseif ($uriParts[1] == "authenticate") {
                 self::handleAuthenticate($uriParts);
-            } elseif (strlen($uriParts[1]) == 32 + 4) {
+            } elseif (strlen($uriParts[1]) == 32 + 4 || strlen($uriParts[1]) == 32) {
                 Users::handleUidURI($uriParts);
             } else {
                 http_response_code(404);
