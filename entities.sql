@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS users(
     description TEXT,
     pronouns VARCHAR(32),
     passwordHash TEXT NOT NULL,
-    isAccountConfirmed BOOLEAN NOT NULL DEFAULT FALSE
+    isAccountConfirmed BOOLEAN NOT NULL DEFAULT FALSE,
+    key2FA VARCHAR(32)
 );
 
 CREATE TABLE IF NOT EXISTS cats(
@@ -30,14 +31,16 @@ CREATE TABLE IF NOT EXISTS cats(
 
 CREATE TABLE cartItems(
     uid VARCHAR(32) PRIMARY KEY,
-    owner VARCHAR(32), cat VARCHAR(32),
+    owner VARCHAR(32),
+    cat VARCHAR(32),
     FOREIGN KEY(owner) REFERENCES users(uid),
     FOREIGN KEY(cat) REFERENCES cats(uid)
 );
 
 CREATE TABLE wishListItems(
     uid VARCHAR(32) PRIMARY KEY,
-    owner VARCHAR(32), cat VARCHAR(32),
+    owner VARCHAR(32),
+    cat VARCHAR(32),
     FOREIGN KEY(owner) REFERENCES users(uid),
     FOREIGN KEY(cat) REFERENCES cats(uid)
 );

@@ -12,10 +12,11 @@ class User
     private ?string $pronouns;
     private string $passwordHash;
     private bool $isAccountConfirmed;
+    private ?string $key2FA;
 
     /**
-     * @param string $username
      * @param string $uid
+     * @param string $username
      * @param string $email
      * @param string|null $image
      * @param string|null $imageMimeType
@@ -23,10 +24,11 @@ class User
      * @param string|null $pronouns
      * @param string $passwordHash
      * @param bool $isAccountConfirmed
+     * @param string $key2FA
      */
-    public function __construct(string $username, string $uid, string $email, ?string $image, ?string $imageMimeType, ?string $description, ?string $pronouns, string $passwordHash, bool $isAccountConfirmed = false) {
-        $this->username = $username;
+    public function __construct(string $uid, string $username, string $email, ?string $image, ?string $imageMimeType, ?string $description, ?string $pronouns, string $passwordHash, bool $isAccountConfirmed, string $key2FA) {
         $this->uid = $uid;
+        $this->username = $username;
         $this->email = $email;
         $this->image = $image;
         $this->imageMimeType = $imageMimeType;
@@ -34,6 +36,7 @@ class User
         $this->pronouns = $pronouns;
         $this->passwordHash = $passwordHash;
         $this->isAccountConfirmed = $isAccountConfirmed;
+        $this->key2FA = $key2FA;
     }
 
     public function getUid(): string {
@@ -108,6 +111,11 @@ class User
         $this->isAccountConfirmed = $isAccountConfirmed;
     }
 
+    public function getKey2FA(): ?string {
+        return $this->key2FA;
+    }
 
-
+    public function setKey2FA(?string $key2FA): void {
+        $this->key2FA = $key2FA;
+    }
 }
