@@ -11,41 +11,70 @@
 
 namespace BaseHandlers;
 
-use Utilities\CommonJsons;
+
+use Enums\NotFoundReason;
+use Exceptions\MethodNotAllowedException;
+use Exceptions\NotFoundException;
 use Utilities\Uid;
 
 class Cats {
-  static function handler(array $uriParts) {
+    /**
+     * @throws NotFoundException
+     * @throws MethodNotAllowedException
+     */
+    static function handler(array $uriParts): string {
+        $uriPartsCount = sizeof($uriParts);
 
-    if(sizeof($uriParts) == 1) {
-      // list cats
-      return;
+        if ($uriPartsCount == 1) {
+            return self::listAllCats();
+        } elseif ($uriPartsCount >= 2) {
+            if(strlen($uriParts[1]) == 32 + 4 || strlen($uriParts[1]) == 32) return self::handleUidURI($uriParts);
+
+            return match ($uriParts[1]) {
+                "create" => self::create(),
+                default => throw new NotFoundException()
+            };
+        } else throw new NotFoundException();
     }
 
-    if(sizeof($uriParts) >= 2) {
-      if($uriParts[1] == "buy") {
-        // generic path /cats/something
-      } elseif(strlen($uriParts[1]) == 32 + 4) {
-        if (!Uid::verify($uriParts[1])) {
-          http_response_code(400);
-          echo CommonJsons::$InvalidUID;
-          return;
-        }elseif (Uid::verify($uriParts[1])) {
-          if (sizeof($uriParts) == 3) {
-            // uid + some action
-            return;
-          }else {
-            // only uid was given
-            return;
-          }
+    static private function listAllCats(): string {
+
+    }
+
+    static private function create(): string {
+
+    }
+
+    /**
+     * @throws NotFoundException
+     * @throws MethodNotAllowedException
+     */
+    static private function handleUidURI(array $uriParts): string {
+        if (!Uid::verify($uriParts[1])) throw new NotFoundException(NotFoundReason::CAT_NOT_FOUND);
+
+        if(sizeof($uriParts) >= 3) {
+            throw new NotFoundException(NotFoundReason::PATH_NOT_FOUND);
         }
-      } else {
-        http_response_code(404);
-        echo CommonJsons::$NotFound;
-        return;
-      }
+
+        $requestMethod = $_SERVER['REQUEST_METHOD'];
+
+        return match ($requestMethod) {
+            'GET' => self::getCat($uriParts),
+            'PUT' => self::updateCat($uriParts),
+            'DELETE' => self::deleteCat($uriParts),
+            default => throw new MethodNotAllowedException($requestMethod)
+        };
     }
 
-    http_response_code(404);
-    echo CommonJsons::$NotFound;  }
+    static private function getCat(array $uriParts): string {
+
+    }
+
+    static private function updateCat(array $uriParts): string {
+
+    }
+
+    static private function deleteCat(array $uriParts): string {
+
+    }
 }

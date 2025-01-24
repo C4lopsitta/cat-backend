@@ -49,9 +49,9 @@ class Users {
      * @param array $uriParts The URL's path in array form
      * @return string The JSON string that will be shown to the User
      * @throws BadRequestException If the request was badly formatted
-     * @throws UserNotVerifiedException If the requested user's account was not verified
      * @throws NotFoundException If the requested path could not be found
      * @throws UnauthorizedException If the authorization was not provided correctly or the token has expired
+     * @throws UserNotVerifiedException When the user account was not verified
      * @throws UserAlreadyExistsException If the user creation request is for an email address that already exists
      * @throws MethodNotAllowedException If the requested method for the given path is not allowed
      * @throws ServerException If a fatal server error has happened
@@ -220,7 +220,6 @@ class Users {
      *
      * @return string A JSON response containing the user UID, the generated token, and the token expiry time (3600 seconds).
      * @throws MethodNotAllowedException If the HTTP request method is not POST.
-     * @throws NotFoundException If the user does not exist or the credentials are invalid.
      * @throws ServerException If an unexpected server error occurs.
      */
     private static function handleAuthenticate(): string {
@@ -272,8 +271,12 @@ class Users {
      *                        a specific operation (e.g., "validate").
      * @return string A result from the corresponding operation, such as validation, fetching,
      *                updating, or deleting a user.
-     * @throws NotFoundException If the UID is invalid or if the specified path does not exists.
+     * @throws NotFoundException If the UID is invalid or if the specified path does not exist.
      * @throws MethodNotAllowedException If the HTTP request method is not supported for the operation.
+     * @throws ServerException When a critical server error happens
+     * @throws BadRequestException When a badly formatted request is made
+     * @throws UserNotVerifiedException When the user account is not verified
+     * @throws UnauthorizedException When a request is made to an authenticated endpoint without proper authentication
      */
     private static function handleUidURI(array $uriParts): string {
         if (!Uid::verify($uriParts[1])) {

@@ -1,6 +1,4 @@
-<?php /** @noinspection ALL */
-/** @noinspection ALL */
-/** @noinspection ALL */
+<?php
 
 /*
  * Copyright (c) 2025.
@@ -19,11 +17,11 @@
 
 namespace DAO;
 
-use DAO\GenericDAO;
+use PDO;
+use PDOStatement;
 use Random\RandomException;
 use Utilities\Uid;
 use Model\User;
-use PDO;
 
 /**
  * Data Access Object (DAO) for managing user records in a persistent data storage.
@@ -54,6 +52,7 @@ class UserDAO extends GenericDAO {
      * @param object $object An object representing the user to be created, containing the necessary attributes such as username, email, description, pronouns, and password hash.
      *
      * @return object|null The same user object with its UID set after creation, or null if the operation fails.
+     * @throws RandomException
      */
     public static function create(object $object): ?object {
         $uid = Uid::compact(Uid::generate());
@@ -187,9 +186,9 @@ class UserDAO extends GenericDAO {
      *
      * @param string $sql The SQL query to be prepared and executed.
      * @param array $params An associative array of parameters to bind to the SQL query.
-     * @return PDOStatement The prepared and executed PDO statement.
+     * @return false|PDOStatement The prepared and executed PDO statement.
      */
-    private static function prepareAndExecute(string $sql, array $params): PDOStatement {
+    private static function prepareAndExecute(string $sql, array $params): false|PDOStatement {
         $stmt = self::$pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt;
