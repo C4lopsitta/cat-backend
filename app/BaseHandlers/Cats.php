@@ -12,9 +12,13 @@
 namespace BaseHandlers;
 
 
+use DAO\CatDAO;
+use DAO\GenericDAO;
 use Enums\NotFoundReason;
+use Exception;
 use Exceptions\MethodNotAllowedException;
 use Exceptions\NotFoundException;
+use Exceptions\ServerException;
 use Utilities\Uid;
 
 class Cats {
@@ -37,8 +41,35 @@ class Cats {
         } else throw new NotFoundException();
     }
 
+    /**
+     * @throws MethodNotAllowedException
+     * @throws ServerException
+     */
     static private function listAllCats(): string {
+        if($_SERVER['REQUEST_METHOD'] != 'GET')
+            throw new MethodNotAllowedException($_SERVER['REQUEST_METHOD']);
 
+        $page = $_GET['page'] ?? null;
+        $itemsPerPage = $_GET['items'] ?? 25;
+
+        try {
+            GenericDAO::connect();
+            $cats = CatDAO::readAll();
+            GenericDAO::disconnect();
+        } catch (Exception $ex) {
+            throw new ServerException(
+               message: $ex->getMessage(),
+               trace: $ex->getTrace(),
+               thrownIn: "\BaseHandlers\Cats::listAllCats()"
+            );
+        }
+        $jsonCats = [];
+
+        foreach($cats as $cat) {
+            $jsonCats[] = $cat->toJson();
+        }
+
+        return json_encode($jsonCats);
     }
 
     static private function create(): string {

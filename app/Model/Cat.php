@@ -10,8 +10,8 @@
  */
 
 namespace Model;
-class Cat
-{
+
+class Cat {
     private string $uid;
     private string $name;
     private ?int $age;
@@ -43,8 +43,7 @@ class Cat
      * @param int $price
      * @param string $ownerUID
      */
-    public function __construct(string $uid, string $name, int $age, string $description, string $whenLastSeen, string $whereLastSeen, string $race, string $furColor, int $weight, bool $isStray, string $image, string $imageMimeType, int $price, string $ownerUID)
-    {
+    public function __construct(string $uid, string $name, int $age, string $description, string $whenLastSeen, string $whereLastSeen, string $race, string $furColor, int $weight, bool $isStray, string $image, string $imageMimeType, int $price, string $ownerUID) {
         $this->uid = $uid;
         $this->name = $name;
         $this->age = $age;
@@ -61,63 +60,51 @@ class Cat
         $this->ownerUID = $ownerUID;
     }
 
-    public function getUid(): string
-    {
+    public function getUid(): string {
         return $this->uid;
     }
 
-    public function setUid(string $uid): void
-    {
+    public function setUid(string $uid): void {
         $this->uid = $uid;
     }
 
-    public function getName(): string
-    {
+    public function getName(): string {
         return $this->name;
     }
 
-    public function setName(string $name): void
-    {
+    public function setName(string $name): void {
         $this->name = $name;
     }
 
-    public function getAge(): int
-    {
+    public function getAge(): int {
         return $this->age;
     }
 
-    public function setAge(int $age): void
-    {
+    public function setAge(int $age): void {
         $this->age = $age;
     }
 
-    public function getDescription(): string
-    {
+    public function getDescription(): string {
         return $this->description;
     }
 
-    public function setDescription(string $description): void
-    {
+    public function setDescription(string $description): void {
         $this->description = $description;
     }
 
-    public function getWhenLastSeen(): string
-    {
+    public function getWhenLastSeen(): string {
         return $this->whenLastSeen;
     }
 
-    public function setWhenLastSeen(string $whenLastSeen): void
-    {
+    public function setWhenLastSeen(string $whenLastSeen): void {
         $this->whenLastSeen = $whenLastSeen;
     }
 
-    public function getWhereLastSeen(): string
-    {
+    public function getWhereLastSeen(): string {
         return $this->whereLastSeen;
     }
 
-    public function setWhereLastSeen(string $whereLastSeen): void
-    {
+    public function setWhereLastSeen(string $whereLastSeen): void {
         $this->whereLastSeen = $whereLastSeen;
     }
 
@@ -129,74 +116,78 @@ class Cat
         $this->race = $race;
     }
 
-    public function getFurColor(): string
-    {
+    public function getFurColor(): string {
         return $this->furColor;
     }
 
-    public function setFurColor(string $furColor): void
-    {
+    public function setFurColor(string $furColor): void {
         $this->furColor = $furColor;
     }
 
-    public function getWeight(): int
-    {
+    public function getWeight(): int {
         return $this->weight;
     }
 
-    public function setWeight(int $weight): void
-    {
+    public function setWeight(int $weight): void {
         $this->weight = $weight;
     }
 
-    public function isStray(): bool
-    {
+    public function isStray(): bool {
         return $this->isStray;
     }
 
-    public function setIsStray(bool $isStray): void
-    {
+    public function setIsStray(bool $isStray): void {
         $this->isStray = $isStray;
     }
 
-    public function getImage(): string
-    {
+    public function getImage(): string {
         return $this->image;
     }
 
-    public function setImage(string $image): void
-    {
+    public function setImage(string $image): void {
         $this->image = $image;
     }
 
-    public function getImageMimeType(): string
-    {
+    public function getImageMimeType(): string {
         return $this->imageMimeType;
     }
 
-    public function setImageMimeType(string $imageMimeType): void
-    {
+    public function setImageMimeType(string $imageMimeType): void {
         $this->imageMimeType = $imageMimeType;
     }
 
-    public function getPrice(): int
-    {
+    public function getPrice(): int {
         return $this->price;
     }
 
-    public function setPrice(int $price): void
-    {
+    public function setPrice(int $price): void {
         $this->price = $price;
     }
 
-    public function getOwnerUID(): ?string
-    {
+    public function getOwnerUID(): ?string {
         return $this->ownerUID;
     }
 
-    public function setOwnerUID(?string $ownerUID): void
-    {
+    public function setOwnerUID(?string $ownerUID): void {
         $this->ownerUID = $ownerUID;
     }
 
+    public function toJson(): array {
+        return [
+           "uid" => $this->uid,
+           "name" => $this->name,
+           "age" => $this->age,
+           "description" => $this->description,
+           "whenLastSeen" => $this->whenLastSeen,
+           "whereLastSeen" => $this->whereLastSeen,
+           "race" => $this->race,
+           "furColor" => $this->furColor,
+           "weight" => $this->weight,
+           "isStray" => $this->isStray,
+           "image" => $this->image,
+           "imageMimeType" => $this->imageMimeType,
+           "price" => $this->price,
+           "ownerUID" => $this->ownerUID
+        ];
+    }
 }
