@@ -31,6 +31,18 @@ use Utilities\MailSender;
 use Utilities\Password;
 use Utilities\Uid;
 
+/**
+ * Main handler for path `/api/v1/users`. Handles all paths inside and the root path with other internal private methods.
+ * @param array $uriParts The URL's path in array form
+ * @return string The JSON string that will be shown to the User
+ * @throws BadRequestException If the request was badly formatted
+ * @throws UserNotVerifiedException If the requested user's account was not verified
+ * @throws NotFoundException If the requested path could not be found
+ * @throws UnauthorizedException If the authorization was not provided correctly or the token has expired
+ * @throws UserAlreadyExistsException If the user creation request is for an email address that already exists
+ * @throws MethodNotAllowedException If the requested method for the given path is not allowed
+ * @throws ServerException If a fatal server error has happened
+ */
 class Users {
     /**
      * Main handler for path `/api/v1/users`. Handles all paths inside and the root path with other internal private methods.
@@ -88,10 +100,18 @@ class Users {
     }
 
     /**
-     * @throws MethodNotAllowedException
-     * @throws BadRequestException
-     * @throws UserAlreadyExistsException
-     * @throws ServerException
+     * Handles the user registration process.
+     *
+     * This method verifies the incoming JSON payload from a POST request, validates the provided
+     * registration data (email, password, and username), and attempts to register a new user in the system.
+     * If the registration is successful, it sends an email confirmation and returns a JSON response
+     * with the registered user's basic information.
+     *
+     * @return string JSON-encoded string containing a response with the registered user data.
+     * @throws MethodNotAllowedException If the HTTP request method is not POST.
+     * @throws BadRequestException If required fields are missing or fail validation checks.
+     * @throws UserAlreadyExistsException If the email or username is already registered.
+     * @throws ServerException If there is an issue with database operations or email sending.
      */
     private static function handleRegistration(): string {
         if($_SERVER["REQUEST_METHOD"] != "POST") {
@@ -192,8 +212,16 @@ class Users {
     }
 
     /**
-     * @throws MethodNotAllowedException
-     * @throws ServerException
+     * Authenticates a user by verifying their email and password, and generates an authentication token upon success.
+     *
+     * This method expects a POST request with a JSON payload containing the user's email and password.
+     * It validates the credentials, checks for the user's existence in the database, and returns a token if authentication is successful.
+     * Throws exceptions for invalid request methods, user not found, or other server errors.
+     *
+     * @return string A JSON response containing the user UID, the generated token, and the token expiry time (3600 seconds).
+     * @throws MethodNotAllowedException If the HTTP request method is not POST.
+     * @throws NotFoundException If the user does not exist or the credentials are invalid.
+     * @throws ServerException If an unexpected server error occurs.
      */
     private static function handleAuthenticate(): string {
         if($_SERVER["REQUEST_METHOD"] != "POST") {
@@ -237,12 +265,15 @@ class Users {
     }
 
     /**
-     * @throws NotFoundException
-     * @throws MethodNotAllowedException
-     * @throws ServerException
-     * @throws UnauthorizedException
-     * @throws BadRequestException
-     * @throws UserNotVerifiedException
+     * Handles operations related to a UID-based URI path.
+     *
+     * @param array $uriParts The parts of the URI path. The second element is expected
+     *                        to be a valid UID, and optionally the third element may indicate
+     *                        a specific operation (e.g., "validate").
+     * @return string A result from the corresponding operation, such as validation, fetching,
+     *                updating, or deleting a user.
+     * @throws NotFoundException If the UID is invalid or if the specified path does not exists.
+     * @throws MethodNotAllowedException If the HTTP request method is not supported for the operation.
      */
     private static function handleUidURI(array $uriParts): string {
         if (!Uid::verify($uriParts[1])) {
@@ -266,11 +297,17 @@ class Users {
     }
 
     /**
-     * @throws MethodNotAllowedException
-     * @throws BadRequestException
-     * @throws ServerException
-     * @throws NotFoundException
-     * @throws UnauthorizedException
+     * Validates an account by confirming the provided confirmation ID and user UID.
+     * It ensures the user exists, matches the confirmation token, and confirms the account if valid.
+     *
+     * @param array $uriParts The URI segments, where the second element contains the user UID.
+     * @return string A JSON-encoded response containing the new user token and its details.
+     *
+     * @throws MethodNotAllowedException If the HTTP method is not POST.
+     * @throws BadRequestException If the confirmation ID is missing or invalid.
+     * @throws NotFoundException If the user does not exist.
+     * @throws UnauthorizedException If the confirmation token is invalid or does not match the user UID.
+     * @throws ServerException If an internal server error occurs during validation.
      */
     private static function validateAccount(array $uriParts): string {
         if($_SERVER["REQUEST_METHOD"] != "POST") {
@@ -344,9 +381,13 @@ class Users {
 
     // region userRUD
     /**
-     * @throws ServerException
-     * @throws UserNotVerifiedException
-     * @throws NotFoundException
+     * Retrieves a user based on the provided URI parts.
+     *
+     * @param array $uriParts An array of URI segments where the second element corresponds to the user identifier.
+     * @return string A JSON-encoded representation of the user.
+     * @throws UserNotVerifiedException if the user account is not verified.
+     * @throws NotFoundException if the user is not found.
+     * @throws ServerException if an unexpected server error occurs.
      */
     private static function getUser(array $uriParts): string {
         try {
@@ -374,10 +415,15 @@ class Users {
     }
 
     /**
-     * @throws UnauthorizedException
-     * @throws ServerException
-     * @throws UserNotVerifiedException
-     * @throws NotFoundException
+     * Updates the details of a user based on the given parameters.
+     *
+     * @param array $uriParts The URI segments where the user identifier is expected at the second position.
+     * @return string A JSON representation of the updated user data.
+     *
+     * @throws UnauthorizedException If the bearer token is invalid or unauthorized.
+     * @throws UserNotVerifiedException If the user's account has not been confirmed.
+     * @throws NotFoundException If the user does not exist.
+     * @throws ServerException For generic server errors or unexpected exceptions.
      */
     private static function updateUser(array $uriParts): string {
         $json = json_decode(file_get_contents('php://input'), true);
@@ -423,9 +469,14 @@ class Users {
     }
 
     /**
-     * @throws ServerException
-     * @throws UnauthorizedException
-     * @throws NotFoundException
+     * Deletes a user from the system based on the provided user identifier in the URI.
+     *
+     * @param array $uriParts An array of URI segments where the second element represents the user identifier.
+     * @return string A JSON-formatted string indicating the success of the operation.
+     *
+     * @throws UnauthorizedException If the token provided for the user is invalid or unauthorized.
+     * @throws NotFoundException If the user does not exist.
+     * @throws ServerException For any unexpected server errors during the operation.
      */
     private static function deleteUser(array $uriParts): string {
         try {
