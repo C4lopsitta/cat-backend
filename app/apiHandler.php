@@ -34,7 +34,7 @@ set_error_handler(function ($severity, $message, $file, $line) {
        'status' => 500,
     ];
 
-    if(getenv("DEBUG_MODE") == "true") {
+    if (getenv("DEBUG_MODE") == "true") {
         $json["file"] = $file;
         $json["line"] = $line;
         $json["severity"] = $severity;

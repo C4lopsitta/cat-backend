@@ -108,15 +108,19 @@ class Users {
 
         $fieldErrors = [];
 
-        // TODO)) Fix regexp
-        if($email == null) { $fieldErrors[] = "email"; }
-//               || !preg_match(Regexes::$Email, $email))
-        if($password == null) { $fieldErrors[] = "password"; }
-//               || !preg_match(Regexes::$Password, $password))
-        if($username == null) { $fieldErrors[] = "username"; }
-//               || !preg_match(Regexes::$Username, $username))
+        // Define regex patterns
+        $emailRegex = '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'; // Valid email regex
+        $passwordRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{12,}$/'; // Password regex (good mix of complexity)
 
-        if (sizeof($fieldErrors) > 0) throw new BadRequestException($fieldErrors);
+        if ($email == null || !preg_match($emailRegex, $email)) {
+            $fieldErrors[] = "email";
+        }
+        if ($password == null || !preg_match($passwordRegex, $password)) {
+            $fieldErrors[] = "password";
+        }
+        if ($username == null || strlen($username) < 4 || strlen($username) > 32) {
+            $fieldErrors[] = "username";
+        }        if (sizeof($fieldErrors) > 0) throw new BadRequestException($fieldErrors);
 
         $passwordHash = Password::hash($password);
 
