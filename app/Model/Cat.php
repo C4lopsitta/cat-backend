@@ -43,7 +43,7 @@ class Cat {
      * @param int $price
      * @param string $ownerUID
      */
-    public function __construct(string $uid, string $name, int $age, string $description, string $whenLastSeen, string $whereLastSeen, string $race, string $furColor, int $weight, bool $isStray, string $image, string $imageMimeType, int $price, string $ownerUID) {
+    public function __construct(string $uid, string $name, int $age, string $description, string $whenLastSeen, string $whereLastSeen, ?string $race, ?string $furColor, int $weight, bool $isStray, ?string $image, ?string $imageMimeType, ?int $price, ?string $ownerUID) {
         $this->uid = $uid;
         $this->name = $name;
         $this->age = $age;
