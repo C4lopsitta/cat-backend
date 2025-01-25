@@ -126,19 +126,12 @@ function handleRequest(array $uriParts): string {
 }
 
 try {
-    switch ($uriParts[0]) {
-        case "users":
-            echo Users::handler($uriParts);
-            break;
-        case "cats":
-            Cats::handler($uriParts);
-            break;
-        case "info":
-            echo CommonJsons::$Info;
-            break;
-        default:
-            throw new NotFoundException(NotFoundReason::PATH_NOT_FOUND);
-    }
+    echo match ($uriParts[0]) {
+        "users" => Users::handler($uriParts),
+        "cats" => Cats::handler($uriParts),
+        "info" => CommonJsons::$Info,
+        default => throw new NotFoundException(NotFoundReason::PATH_NOT_FOUND),
+    };
 } catch (BaseApiException $ex) {
     http_response_code($ex::$HTTP_STATUS_CODE);
     error_log($ex->toLog());
