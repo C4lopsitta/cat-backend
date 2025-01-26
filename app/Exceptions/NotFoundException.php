@@ -12,6 +12,7 @@
 namespace Exceptions;
 
 use Enums\NotFoundReason;
+use Exception;
 use Exceptions\BaseApiException;
 
 class NotFoundException extends BaseApiException {
@@ -28,7 +29,8 @@ class NotFoundException extends BaseApiException {
 
         return <<< JSON
 {
-  "error": {$reason},
+  "error": "Not found",
+  "reason": {$reason},
   "status": 404
 }
 JSON;

@@ -38,7 +38,7 @@ set_error_handler(function ($severity, $message, $file, $line) {
         $json["file"] = $file;
         $json["line"] = $line;
         $json["severity"] = $severity;
-        $json["errorDetails"] = $message;
+        $json["exception"] = $message;
     }
 
     echo json_encode($json);
@@ -52,14 +52,14 @@ register_shutdown_function(function () {
     if ($error !== null) {
         http_response_code(500);
         $json = [
-            'error' => "Fatal Error",
+            'error' => "Server Error",
             'status' => 500
         ];
 
         if(getenv("DEBUG_MODE") == "true") {
             $json["file"] = $error["file"];
             $json["line"] = $error["line"];
-            $json["errorDetails"] = $error["message"];
+            $json["exception"] = $error["message"];
             $json["type"] = $error["type"];
         }
 

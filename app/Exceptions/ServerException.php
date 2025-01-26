@@ -32,7 +32,7 @@ class ServerException extends BaseApiException {
   "error": "Server error",
   "trace": "$this->trace",
   "exception": "{$this->message}"
-  "thrownIn": "{$this->thrownIn}",
+  "thrown_in": "{$this->thrownIn}",
   "status": 500
 }
 JSON;

@@ -25,6 +25,7 @@ class Cats {
     /**
      * @throws NotFoundException
      * @throws MethodNotAllowedException
+     * @throws ServerException
      */
     static function handler(array $uriParts): string {
         $uriPartsCount = sizeof($uriParts);
