@@ -95,7 +95,7 @@ class CatDAO extends GenericDAO
     public static function readByOwner(string $ownerUid): ?array {
         $ownerUid = Uid::compact($ownerUid);
 
-        $sql = "SELECT * FROM cats WHERE cats.owner = :idOwner;";
+        $sql = "SELECT * FROM cats WHERE owner = :idOwner;";
         $stmt = self::$pdo->prepare($sql);
         $stmt->execute([':idOwner' => $ownerUid]);
         $results = $stmt->fetchAll(PDO::FETCH_OBJ);
