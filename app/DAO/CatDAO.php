@@ -151,4 +151,11 @@ class CatDAO extends GenericDAO
         $stmt = self::$pdo->prepare($sql);
         return $stmt->execute([':id' => $id]);
     }
+
+    public static function doesCatExist(string $uid) {
+        $sql = "SELECT * FROM cats WHERE uid LIKE :uid";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([':uid' => $uid]);
+        return $stmt->rowCount() > 0;
+    }
 }

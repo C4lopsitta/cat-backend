@@ -394,6 +394,7 @@ class Users {
      */
     private static function getUser(array $uriParts): string {
         try {
+            // TODO)) Fix UserNotVerified as it returns that even when not found
             GenericDAO::connect();
             if(!UserDAO::doesUserExist($uriParts[1])) {
                 GenericDAO::disconnect();

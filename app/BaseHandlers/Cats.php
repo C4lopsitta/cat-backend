@@ -43,8 +43,15 @@ class Cats {
     }
 
     /**
-     * @throws MethodNotAllowedException
-     * @throws ServerException
+     * Retrieves a list of all cats as a JSON-encoded string.
+     *
+     * This method handles the GET HTTP method for listing all cats from the database.
+     * Pagination can be controlled via the optional query parameters 'page' and 'items'
+     * for specifying the current page number and the number of items per page, respectively.
+     *
+     * @return string JSON-encoded string containing the list of all cats.
+     * @throws MethodNotAllowedException If the request method is not GET.
+     * @throws ServerException If an error occurs during the database operation or server error.
      */
     static private function listAllCats(): string {
         if($_SERVER['REQUEST_METHOD'] != 'GET')
@@ -64,6 +71,8 @@ class Cats {
                thrownIn: "\BaseHandlers\Cats::listAllCats()"
             );
         }
+        if(sizeof($cats) == 0) return "[]";
+        
         $jsonCats = [];
 
         foreach($cats as $cat) {
@@ -98,8 +107,29 @@ class Cats {
         };
     }
 
+    /**
+     * @throws NotFoundException
+     * @throws ServerException
+     */
     static private function getCat(array $uriParts): string {
+        try {
+            GenericDAO::connect();
+            if(!CatDAO::doesCatExist($uriParts[1])) {
+                GenericDAO::disconnect();
+                throw new NotFoundException(NotFoundReason::CAT_NOT_FOUND);
+            }
 
+            $cat = CatDAO::read($uriParts[1]);
+            GenericDAO::disconnect();
+        } catch (NotFoundException $ex) { throw $ex; } catch (Exception $ex) {
+            throw new ServerException(
+               message: $ex->getMessage(),
+               trace: $ex->getTrace(),
+               thrownIn: "\BaseHandlers\Cats::getCat()"
+            );
+        }
+
+        return json_encode($cat->toJson());
     }
 
     static private function updateCat(array $uriParts): string {

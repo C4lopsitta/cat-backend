@@ -17,10 +17,7 @@ class Uid {
   static function verify(string $uid): bool {
     $uid = self::format($uid);
     if(!preg_match("/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i", $uid)) return false;
-
-    if(strlen($uid) == 32) return true;
     if(strlen(join(explode("-", $uid))) == 32) return true;
-
     return false;
   }
 

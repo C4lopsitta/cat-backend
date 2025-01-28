@@ -12,7 +12,6 @@
 namespace Exceptions;
 
 use Enums\NotFoundReason;
-use Exception;
 use Exceptions\BaseApiException;
 
 class NotFoundException extends BaseApiException {
