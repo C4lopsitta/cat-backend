@@ -123,14 +123,14 @@ class User
 
         if($ownedCats != null) {
             foreach ($ownedCats as $cat) {
-                $ownedCatsList .= $cat->toJson() . ",";
+                $ownedCatsList .= json_encode($cat->toJson()) . ",";
             }
         }
         $ownedCatsList .= "]";
 
         if($wishlist != null) {
             foreach ($wishlist as $cat) {
-                $wishlistList .= $cat->toJson() . ",";
+                $wishlistList .= json_encode($cat->toJson()) . ",";
             }
         }
         $wishlistList .= "]";
