@@ -14,11 +14,17 @@ namespace BaseHandlers;
 
 use DAO\CatDAO;
 use DAO\GenericDAO;
+use DAO\RedisDb;
+use DAO\UserDAO;
 use Enums\NotFoundReason;
+use Enums\UnauthorizedReason;
 use Exception;
 use Exceptions\MethodNotAllowedException;
 use Exceptions\NotFoundException;
 use Exceptions\ServerException;
+use Exceptions\UnauthorizedException;
+use Exceptions\UserNotVerifiedException;
+use Model\Token;
 use Utilities\Uid;
 
 class Cats {
@@ -89,6 +95,7 @@ class Cats {
     /**
      * @throws NotFoundException
      * @throws MethodNotAllowedException
+     * @throws ServerException
      */
     static private function handleUidURI(array $uriParts): string {
         if (!Uid::verify($uriParts[1])) throw new NotFoundException(NotFoundReason::CAT_NOT_FOUND);
@@ -132,8 +139,64 @@ class Cats {
         return json_encode($cat->toJson());
     }
 
+    /**
+     * @throws NotFoundException
+     * @throws ServerException
+     * @throws UnauthorizedException
+     * @throws UserNotVerifiedException
+     */
     static private function updateCat(array $uriParts): string {
+        $json = json_decode(file_get_contents("php://input"), true);
 
+        try {
+            $bearerToken = Token::getTokenFromHeader();
+
+            RedisDb::connect();
+            GenericDAO::connect();
+
+            $authenticatedUser = RedisDb::validateUserToken($bearerToken, $uriParts[1]);
+
+            if(UserDAO::read($authenticatedUser) == null) throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
+            if(!UserDAO::isUserAccountConfirmed($authenticatedUser)) throw new UserNotVerifiedException();
+
+            $cat = CatDAO::read($uriParts[1]);
+            $catOwner = Uid::compact($cat->getOwnerUID());
+
+            if($catOwner == null || strlen($catOwner != 32) || strcmp($catOwner, $authenticatedUser) != 0)
+                throw new UnauthorizedException(UnauthorizedReason::NOT_ALLOWED);
+
+            if(array_key_exists('age', $json)) {
+                $cat->setAge($json['age']);
+            }
+            if(array_key_exists('description', $json)) {
+                $cat->setDescription($json['description']);
+            }
+            if(array_key_exists('whenLastSeen', $json)) {
+                $cat->setWhenLastSeen($json['whenLastSeen']);
+            }
+            if(array_key_exists("whereLastSeen", $json)) {
+                $cat->setWhereLastSeen($json["whereLastSeen"]);
+            }
+            if(array_key_exists("weight", $json)) {
+                $cat->setWeight($json["weight"]);
+            }
+            if(array_key_exists("isStray", $json)) {
+                $cat->setIsStray($json["isStray"]);
+            }
+
+            CatDAO::update($cat);
+            GenericDAO::disconnect();
+        } catch (UnauthorizedException|UserNotVerifiedException|NotFoundException $ex) { GenericDAO::disconnect(); throw $ex; } catch (Exception $ex) {
+            GenericDAO::disconnect();
+            throw new ServerException(
+               message: $ex->getMessage(),
+               code: $ex->getCode(),
+               trace: $ex->getTrace(),
+               thrownIn: "\BaseHandlers\Users::updateUser()"
+            );
+        }
+
+        return json_encode($cat->toJson());
     }
 
     static private function deleteCat(array $uriParts): string {

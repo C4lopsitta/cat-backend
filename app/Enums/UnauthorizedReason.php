@@ -16,12 +16,16 @@ enum UnauthorizedReason {
     case NO_TOKEN_PROVIDED;
     case INVALID_TOKEN;
     case UNDEFINED;
+    case NOT_ALLOWED;
+
+
 
     function toReason(): string {
         return match ($this) {
             self::TOKEN_EXPIRED => 'Token expired',
             self::NO_TOKEN_PROVIDED => 'No token provided',
             self::INVALID_TOKEN => 'Invalid token',
+            self::NOT_ALLOWED => 'User is not allowed to perform this action',
             default => 'Unauthorized'
         };
     }

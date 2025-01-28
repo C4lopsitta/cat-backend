@@ -440,7 +440,7 @@ class Users {
 
             RedisDb::validateUserToken($bearerToken, $uriParts[1]);
 
-            if(!UserDAO::doesUserExist($uriParts[1])) throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
+            if(UserDAO::read($uriParts[1] == null)) throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
             if(!UserDAO::isUserAccountConfirmed($uriParts[1])) throw new UserNotVerifiedException();
 
             $user = UserDAO::read($uriParts[1]);
