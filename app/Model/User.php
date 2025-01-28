@@ -118,22 +118,11 @@ class User
     }
 
     public function toJson(?array $ownedCats = null, ?array $wishlist = null): string {
-        $ownedCatsList = "[";
-        $wishlistList = "[";
+        $catsList = [];
+        $wishlistList = [];
 
-        if($ownedCats != null) {
-            foreach ($ownedCats as $cat) {
-                $ownedCatsList .= json_encode($cat->toJson()) . ",";
-            }
-        }
-        $ownedCatsList .= "]";
-
-        if($wishlist != null) {
-            foreach ($wishlist as $cat) {
-                $wishlistList .= json_encode($cat->toJson()) . ",";
-            }
-        }
-        $wishlistList .= "]";
+        foreach ($ownedCats as $cat) $catsList += $cat->toJson();
+        foreach ($wishlist as $cat) $wishlistList += $cat->toJson();
 
         return json_encode([
             "uid" => $this->uid,
@@ -142,7 +131,7 @@ class User
             "imageMimeType" => $this->imageMimeType,
             "description" => $this->description,
             "pronouns" => $this->pronouns,
-            "cats" => $ownedCatsList,
+            "cats" => $catsList,
             "wishlist" => $wishlistList
         ]);
     }
