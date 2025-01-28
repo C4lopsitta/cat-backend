@@ -117,7 +117,7 @@ class User
         $this->isAccountConfirmed = $isAccountConfirmed;
     }
 
-    public function toJson(?array $ownedCats = null, ?array $wishlist = null): string {
+    public function toJson(array $ownedCats = [], array $wishlist = []): string {
         $catsList = [];
         $wishlistList = [];
 
