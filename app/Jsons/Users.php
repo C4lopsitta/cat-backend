@@ -47,7 +47,7 @@ JSON;
 JSON;
     }
 
-    static function user(User $user): string {
+    static function user(User $user, string $ownedCats = ""): string {
         $uid = Uid::format($user->getUid());
         return <<< JSON
 {
@@ -58,6 +58,7 @@ JSON;
     "description": "{$user->getDescription()}",
     "pronouns": "{$user->getPronouns()}",
     "cats": [
+      {$ownedCats}
     ],
     "wishlist": [
     ]

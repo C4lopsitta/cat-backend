@@ -11,6 +11,7 @@
 
 namespace BaseHandlers;
 
+use DAO\CatDAO;
 use DAO\GenericDAO;
 use DAO\RedisDb;
 use DAO\UserDAO;
@@ -402,11 +403,12 @@ class Users {
             }
 
             $user = UserDAO::read($uriParts[1]);
+            $userCats = CatDAO::readByOwner($uriParts[1]);
             GenericDAO::disconnect();
 
             if ($user == null) throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
 
-            return \Jsons\Users::user($user);
+            return $user->toJson(ownedCats: $userCats);
         }  catch (UserNotVerifiedException|NotFoundException $ex) { throw $ex; } catch (Exception $ex) {
             GenericDAO::disconnect();
             throw new ServerException(

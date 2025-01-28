@@ -117,6 +117,33 @@ class User
         $this->isAccountConfirmed = $isAccountConfirmed;
     }
 
+    public function toJson(?array $ownedCats = null, ?array $wishlist = null): string {
+        $ownedCatsList = "[";
+        $wishlistList = "[";
 
+        if($ownedCats != null) {
+            foreach ($ownedCats as $cat) {
+                $ownedCatsList .= $cat->toJson() . ",";
+            }
+        }
+        $ownedCatsList .= "]";
 
+        if($wishlist != null) {
+            foreach ($wishlist as $cat) {
+                $wishlistList .= $cat->toJson() . ",";
+            }
+        }
+        $wishlistList .= "]";
+
+        return json_encode([
+            "uid" => $this->uid,
+            "username" => $this->username,
+            "image" => $this->image,
+            "imageMimeType" => $this->imageMimeType,
+            "description" => $this->description,
+            "pronouns" => $this->pronouns,
+            "cats" => $ownedCatsList,
+            "wishlist" => $wishlistList
+        ]);
+    }
 }
