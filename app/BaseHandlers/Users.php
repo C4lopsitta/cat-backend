@@ -402,11 +402,12 @@ class Users {
             }
 
             $user = UserDAO::read($uriParts[1]);
-            GenericDAO::disconnect();
 
             if ($user == null) throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
 
             $userCats = CatDAO::readByOwner($uriParts[1]);
+            GenericDAO::disconnect();
+
             return $user->toJson(ownedCats: $userCats);
         }  catch (UserNotVerifiedException|NotFoundException $ex) { throw $ex; } catch (Exception $ex) {
             GenericDAO::disconnect();
