@@ -31,7 +31,7 @@ use Model\User;
 class UserDAO extends GenericDAO {
     private const SQL_CREATE_USER = "INSERT INTO users 
                         VALUES(:uid, :username, :email, null, null, :description, :pronouns, :passwordHash, false)";
-    private const SQL_READ_USER = "SELECT * FROM users WHERE users.uid LIKE :uid;";
+    private const SQL_READ_USER = "SELECT * FROM users WHERE uid LIKE :uid;";
     private const SQL_CHECK_ACCOUNT_CONFIRMED = "SELECT * FROM users WHERE users.uid = :uid AND isAccountConfirmed = true;";
     private const SQL_FETCH_UID_FROM_EMAIL = "SELECT uid FROM users WHERE email= :email;";
     private const SQL_CHECK_USER_EXISTS = "SELECT * FROM users WHERE email LIKE :email;";

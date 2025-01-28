@@ -395,19 +395,18 @@ class Users {
      */
     private static function getUser(array $uriParts): string {
         try {
-            // TODO)) Fix UserNotVerified as it returns that even when not found
             GenericDAO::connect();
-            if(!UserDAO::doesUserExist($uriParts[1])) {
+            if(!UserDAO::isUserAccountConfirmed($uriParts[1])) {
                 GenericDAO::disconnect();
                 throw new UserNotVerifiedException("User account is not verified.");
             }
 
             $user = UserDAO::read($uriParts[1]);
-            $userCats = CatDAO::readByOwner($uriParts[1]);
             GenericDAO::disconnect();
 
             if ($user == null) throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
 
+            $userCats = CatDAO::readByOwner($uriParts[1]);
             return $user->toJson(ownedCats: $userCats);
         }  catch (UserNotVerifiedException|NotFoundException $ex) { throw $ex; } catch (Exception $ex) {
             GenericDAO::disconnect();

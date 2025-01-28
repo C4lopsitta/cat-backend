@@ -11,6 +11,8 @@
 
 namespace Model;
 
+use Utilities\Uid;
+
 class Cat {
     private string $uid;
     private string $name;
@@ -174,7 +176,7 @@ class Cat {
 
     public function toJson(): array {
         return [
-           "uid" => $this->uid,
+           "uid" => Uid::format($this->uid),
            "name" => $this->name,
            "age" => $this->age,
            "description" => $this->description,
@@ -187,7 +189,7 @@ class Cat {
            "image" => $this->image,
            "imageMimeType" => $this->imageMimeType,
            "price" => $this->price,
-           "ownerUID" => $this->ownerUID
+           "ownerUID" => Uid::format($this->ownerUID)
         ];
     }
 }
