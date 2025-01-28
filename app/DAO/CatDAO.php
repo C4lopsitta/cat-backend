@@ -24,8 +24,7 @@ class CatDAO extends GenericDAO
     /**
      * @throws RandomException
      */
-    public static function create(object $object): ?object
-    {
+    public static function create(object $object): ?object {
         $sql = "INSERT INTO cats(
                      uid, name, age, description, whenLastSeen, whereLastSeen, race, furColor, weight, isStray, image,
                      imageMimeType, price, owner
@@ -53,7 +52,7 @@ class CatDAO extends GenericDAO
             ':owner' => $object->getOwner()
         ]);
 
-        $object->setUid($uid);
+        $object->setUid(Uid::format($uid));
 
         return $object;
 
@@ -102,7 +101,7 @@ class CatDAO extends GenericDAO
 
         $cats = array();
         foreach ($results as $result) {
-            $cats[] = new Cat($result->uid, $result->name, $result->age, $result->description, $result->whenLastSeen,
+            $cats[] = new Cat(Uid::format($result->uid), $result->name, $result->age, $result->description, $result->whenLastSeen,
                 $result->whereLastSeen, $result->race,$result->furColor, $result->weight, $result->isStray, $result->image, $result->imageMimeType,
                 $result->price, $result->owner);
         }
@@ -110,8 +109,7 @@ class CatDAO extends GenericDAO
         return $cats;
     }
 
-    public static function update(object $object): bool
-    {
+    public static function update(object $object): bool {
         $sql = "UPDATE cats SET
                 name = :name,
                 age = :age,
@@ -144,18 +142,21 @@ class CatDAO extends GenericDAO
             ':imageMimeType' => $object->getImageMimeType(),
             ':price' => $object->getPrice(),
             ':owner' => $object->getOwner(),
-            ':id' => $object->getUid()
+            ':id' => Uid::compact($object->getUid())
         ]);
     }
 
-    public static function delete(string $id): bool
-    {
+    public static function delete(string $id): bool {
+        $id = Uid::compact($id);
+
         $sql = "DELETE FROM cats WHERE cats.uid = :id;";
         $stmt = self::$pdo->prepare($sql);
         return $stmt->execute([':id' => $id]);
     }
 
     public static function doesCatExist(string $uid) {
+        $uid = Uid::compact($uid);
+
         $sql = "SELECT * FROM cats WHERE uid LIKE :uid";
         $stmt = self::$pdo->prepare($sql);
         $stmt->execute([':uid' => $uid]);

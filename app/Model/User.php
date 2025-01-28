@@ -10,6 +10,8 @@
  */
 
 namespace Model;
+use Utilities\Uid;
+
 class User
 {
     private string $uid;
@@ -125,7 +127,7 @@ class User
         foreach ($wishlist as $cat) $wishlistList += $cat->toJson();
 
         return json_encode([
-            "uid" => $this->uid,
+            "uid" => Uid::format($this->uid),
             "username" => $this->username,
             "image" => $this->image,
             "imageMimeType" => $this->imageMimeType,
