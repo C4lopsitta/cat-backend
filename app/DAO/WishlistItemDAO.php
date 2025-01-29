@@ -70,9 +70,9 @@ class WishlistItemDAO extends GenericDAO
 
         $cats = array();
         foreach ($results as $result) {
-            $cats[] = new Cat($result["uid"], $result["name"], $result["age"], $result["description"], $result["whenLastSeen"],
+            $cats[] = new Cat($result["name"], $result["age"], $result["description"], $result["whenLastSeen"],
                 $result["race"], $result["furColor"], $result["weight"], $result["image"], $result["imageMimeType"],
-                $result["price"], $result["owner"]);
+                $result["price"], $result["owner"], $result["uid"]);
         }
 
         return $cats;
