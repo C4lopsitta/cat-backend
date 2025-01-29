@@ -36,14 +36,14 @@ class Cat {
      * @param string $description
      * @param string $whenLastSeen
      * @param string $whereLastSeen
-     * @param string $race
-     * @param string $furColor
+     * @param string|null $race
+     * @param string|null $furColor
      * @param int $weight
      * @param bool $isStray
-     * @param string $image
-     * @param string $imageMimeType
-     * @param int $price
-     * @param string $ownerUID
+     * @param string|null $image
+     * @param string|null $imageMimeType
+     * @param int|null $price
+     * @param string|null $ownerUID
      */
     public function __construct(string $uid, string $name, int $age, string $description, string $whenLastSeen, string $whereLastSeen, ?string $race, ?string $furColor, int $weight, bool $isStray, ?string $image, ?string $imageMimeType, ?int $price, ?string $ownerUID) {
         $this->uid = $uid;
@@ -189,7 +189,7 @@ class Cat {
            "image" => $this->image,
            "imageMimeType" => $this->imageMimeType,
            "price" => $this->price,
-           "ownerUID" => Uid::format($this->ownerUID)
+           "ownerUID" => ($this->ownerUID) ? Uid::format($this->ownerUID) : ""
         ];
     }
 }

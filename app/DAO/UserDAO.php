@@ -92,6 +92,8 @@ class UserDAO extends GenericDAO {
      * @return bool True if the user's account is confirmed, false otherwise.
      */
     public static function isUserAccountConfirmed(string $uid): bool {
+        $uid = Uid::compact($uid);
+
         $stmt = self::prepareAndExecute(self::SQL_CHECK_ACCOUNT_CONFIRMED, ['uid' => $uid]);
         return $stmt->rowCount() > 0;
     }
