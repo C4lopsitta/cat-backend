@@ -88,7 +88,9 @@ class Cats {
         return json_encode($jsonCats);
     }
 
-    static private function create(): string {}
+    static private function create(): string {
+
+    }
 
     /**
      * @throws NotFoundException

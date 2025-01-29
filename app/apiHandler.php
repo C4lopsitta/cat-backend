@@ -24,6 +24,8 @@ use Exceptions\UserAlreadyExistsException;
 use Exceptions\UserNotVerifiedException;
 use Utilities\CommonJsons;
 
+$versionHash = "";
+
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
@@ -120,18 +122,18 @@ function handleRequest(array $uriParts): string {
     return match($uriParts[0]) {
         "cats" => Cats::handler($uriParts),
         "users" => Users::handler($uriParts),
-        "info" => CommonJsons::$Info,
+        "info" => <<< JSON
+{
+  "version": "1",
+  "docs": "https://c4lopsitta.github.io/cat-docs/index_md.html"
+}
+JSON,
         default => throw new NotFoundException(NotFoundReason::PATH_NOT_FOUND)
     };
 }
 
 try {
-    echo match ($uriParts[0]) {
-        "users" => Users::handler($uriParts),
-        "cats" => Cats::handler($uriParts),
-        "info" => CommonJsons::$Info,
-        default => throw new NotFoundException(NotFoundReason::PATH_NOT_FOUND),
-    };
+    echo handleRequest($uriParts);
 } catch (BaseApiException $ex) {
     http_response_code($ex::$HTTP_STATUS_CODE);
     error_log($ex->toLog());
