@@ -50,7 +50,7 @@ class RedisDb {
     /**
      * @throws UnauthorizedException
      */
-    static public function validateUserToken(string $token, string $userUid): string {
+    static public function validateUserToken(string $token, ?string $userUid = null): string {
         if(!self::$instance) {
             throw new RedisException("RedisDb connection not established");
         }
@@ -62,11 +62,11 @@ class RedisDb {
             throw new UnauthorizedException(UnauthorizedReason::INVALID_TOKEN);
         }
 
-        if(strlen($userUid) > 0) {
+        if($userUid != null) {
             return $userUid;
+        } else {
+            return $redisUserUid;
         }
-
-        throw new UnauthorizedException(UnauthorizedReason::INVALID_TOKEN);
     }
 
     static public function invalidateUserTokens(string $userUid): void {

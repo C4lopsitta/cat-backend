@@ -19,11 +19,13 @@ use DAO\UserDAO;
 use Enums\NotFoundReason;
 use Enums\UnauthorizedReason;
 use Exception;
+use Exceptions\BadRequestException;
 use Exceptions\MethodNotAllowedException;
 use Exceptions\NotFoundException;
 use Exceptions\ServerException;
 use Exceptions\UnauthorizedException;
 use Exceptions\UserNotVerifiedException;
+use Model\Cat;
 use Model\Token;
 use Utilities\Uid;
 
@@ -88,8 +90,76 @@ class Cats {
         return json_encode($jsonCats);
     }
 
+    /**
+     * @throws ServerException
+     * @throws UnauthorizedException
+     * @throws UserNotVerifiedException
+     * @throws NotFoundException
+     * @throws BadRequestException
+     */
     static private function create(): string {
+        $json = json_decode(file_get_contents('php://input'), true);
 
+        try {
+            $bearerToken = Token::getTokenFromHeader();
+
+            RedisDb::connect();
+            GenericDAO::connect();
+
+            $authenticatedUser = RedisDb::validateUserToken($bearerToken);
+
+            if (UserDAO::read($authenticatedUser) == null) throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
+            if (!UserDAO::isUserAccountConfirmed($authenticatedUser)) throw new UserNotVerifiedException();
+
+            $keyErrors = [];
+
+            if(!array_key_exists("name", $json)) {
+                $keyErrors[] = "name";
+            }
+            if(!array_key_exists("age", $json)) {
+                $keyErrors[] = "age";
+            }
+            if(!array_key_exists("isStray", $json)) {
+                $keyErrors[] = "isStray";
+            }
+
+            if(sizeof($keyErrors) > 0) {
+                throw new BadRequestException($keyErrors);
+            }
+
+            $newCat = new Cat(
+               name: $json['name'],
+               age: $json['age'],
+               description: $json['description'] ?? null,
+               whenLastSeen: $json['whenLastSeen'] ?? null,
+               whereLastSeen: $json['whereLastSeen'] ?? null,
+               race: $json['race'] ?? null,
+               furColor: $json['furColor'] ?? null,
+               weight: $json['weight'] ?? null,
+               isStray: $json['isStray'],
+               image: $json['image'] ?? null,
+               imageMimeType: $json['imageMimeType'] ?? null,
+               price: $json['price'] ?? null,
+               ownerUID: Uid::compact($authenticatedUser)
+            );
+
+            CatDAO::create($newCat);
+
+            return json_encode([
+               "uid" => $newCat->getUid(),
+            ]);
+
+        } catch (UnauthorizedException|NotFoundException|UserNotVerifiedException|BadRequestException $ex) {
+            GenericDAO::disconnect();
+            throw $ex;
+        }
+        catch (Exception $ex) {
+            throw new ServerException(
+               message: $ex->getMessage(),
+               trace: $ex->getTrace(),
+               thrownIn: "\BaseHandlers\Cats::create()"
+            );
+        }
     }
 
     /**
@@ -156,7 +226,7 @@ class Cats {
             RedisDb::connect();
             GenericDAO::connect();
 
-            $authenticatedUser = RedisDb::validateUserToken($bearerToken, $uriParts[1]);
+            $authenticatedUser = RedisDb::validateUserToken($bearerToken);
 
             if (UserDAO::read($authenticatedUser) == null) throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
             if (!UserDAO::isUserAccountConfirmed($authenticatedUser)) throw new UserNotVerifiedException();

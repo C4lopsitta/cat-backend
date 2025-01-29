@@ -14,7 +14,7 @@ namespace Model;
 use Utilities\Uid;
 
 class Cat {
-    private string $uid;
+    private ?string $uid;
     private string $name;
     private ?int $age;
     private ?string $description;
@@ -45,7 +45,7 @@ class Cat {
      * @param int|null $price
      * @param string|null $ownerUID
      */
-    public function __construct(string $uid, string $name, int $age, ?string $description, ?string $whenLastSeen, ?string $whereLastSeen, ?string $race, ?string $furColor, ?int $weight, bool $isStray, ?string $image, ?string $imageMimeType, ?int $price, ?string $ownerUID) {
+    public function __construct(?string $uid = null, string $name, int $age, ?string $description, ?string $whenLastSeen, ?string $whereLastSeen, ?string $race, ?string $furColor, ?int $weight, bool $isStray, ?string $image, ?string $imageMimeType, ?int $price, ?string $ownerUID) {
         $this->uid = $uid;
         $this->name = $name;
         $this->age = $age;
