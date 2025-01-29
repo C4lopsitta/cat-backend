@@ -22,7 +22,6 @@ use Exceptions\ServerException;
 use Exceptions\UnauthorizedException;
 use Exceptions\UserAlreadyExistsException;
 use Exceptions\UserNotVerifiedException;
-use Utilities\CommonJsons;
 
 $versionHash = "";
 

@@ -97,7 +97,12 @@ class Users {
             );
         }
 
-        return \Jsons\Users::listUsers($users, $page, $itemsPerPage);
+        $usersJsons = [];
+        foreach($users as $user) {
+            $usersJsons[] = $user->toCompactJson();
+        }
+
+        return json_encode($usersJsons);
     }
 
     /**
@@ -209,7 +214,11 @@ class Users {
             );
         }
 
-        return \Jsons\Users::userRegistrationResponse(username: $username, email: $email, uid: Uid::format($user->getUid()));
+        return json_encode([
+           "username" => $username,
+            "email" => $email,
+            "uid" => Uid::format($user->getUid())
+        ]);
     }
 
     /**
@@ -250,7 +259,11 @@ class Users {
                 $token = Token::generate($user->getUid());
                 RedisDb::storeUserToken($token->getToken(), $user->getUid());
 
-                return \Jsons\Users::newUserTokenResponse($user->getUid(), $token->getToken(), 3600);
+                return json_encode([
+                   "uid" => $user->getUid(),
+                   "token" => $token->getToken(),
+                   "expiresIn" => 3600
+                ]);
             } else {
                 throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
             }
@@ -371,7 +384,11 @@ class Users {
             UserDAO::update($user);
             GenericDAO::disconnect();
 
-            return \Jsons\Users::newUserTokenResponse($user->getUid(), $newUserToken->getToken(), 3600);
+            return json_encode([
+                "uid" => $user->getUid(),
+                "token" => $newUserToken->getToken(),
+                "expiresIn" => 3600
+            ]);
         } catch (Exception $ex) {
             throw new ServerException(
                message: $ex->getMessage(),
@@ -471,7 +488,8 @@ class Users {
                thrownIn: "\BaseHandlers\Users::updateUser()"
             );
         }
-        return \Jsons\Users::user($user);
+
+        return json_encode($user->toCompactJson());
     }
 
     /**

@@ -137,4 +137,15 @@ class User
             "wishlist" => $wishlist
         ]);
     }
+
+    public function toCompactJson(): array {
+        return [
+            "uid" => Uid::format($this->uid),
+            "username" => $this->username,
+            "image" => $this->image,
+            "imageMimeType" => $this->imageMimeType,
+            "description" => $this->description,
+            "pronouns" => $this->pronouns,
+        ];
+    }
 }
