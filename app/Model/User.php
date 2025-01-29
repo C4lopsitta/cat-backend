@@ -120,11 +120,11 @@ class User
     }
 
     public function toJson(array $ownedCats = [], array $wishlist = []): string {
-        $catsList = [];
-        $wishlistList = [];
-
-        foreach ($ownedCats as $cat) $catsList += $cat->toJson();
-        foreach ($wishlist as $cat) $wishlistList += $cat->toJson();
+//        $catsList = [];
+//        $wishlistList = [];
+//
+//        foreach ($ownedCats as $cat) $catsList += $cat->toJson();
+//        foreach ($wishlist as $cat) $wishlistList += $cat->toJson();
 
         return json_encode([
             "uid" => Uid::format($this->uid),
@@ -133,8 +133,8 @@ class User
             "imageMimeType" => $this->imageMimeType,
             "description" => $this->description,
             "pronouns" => $this->pronouns,
-            "cats" => $catsList,
-            "wishlist" => $wishlistList
+            "cats" => $ownedCats,
+            "wishlist" => $wishlist
         ]);
     }
 }

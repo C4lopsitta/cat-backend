@@ -405,7 +405,7 @@ class Users {
 
             if ($user == null) throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
 
-            $userCats = CatDAO::readByOwner($uriParts[1]);
+            $userCats = CatDAO::readByOwnerUidList($uriParts[1]);
             GenericDAO::disconnect();
 
             return $user->toJson(ownedCats: $userCats);
