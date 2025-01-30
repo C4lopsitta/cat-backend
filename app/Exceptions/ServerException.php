@@ -27,15 +27,13 @@ class ServerException extends BaseApiException {
     }
 
     public function toJson(): string {
-        return <<< JSON
-{
-  "error": "Server error",
-  "trace": "$this->trace",
-  "exception": "{$this->message}"
-  "thrown_in": "{$this->thrownIn}",
-  "status": 500
-}
-JSON;
+        return json_encode([
+            "error" => "Server error",
+            "trace" => $this->trace,
+            "exception" => $this->message,
+            "thrown_in" => $this->thrownIn,
+            "status" => 500
+        ]);
     }
 
     public function toLog(): string {
