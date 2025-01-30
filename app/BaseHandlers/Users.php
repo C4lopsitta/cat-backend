@@ -250,6 +250,10 @@ class Users {
             $userUid = UserDAO::fetchUserUidFromEmail($json['email']);
             $password = $json['password'];
 
+            if($password == null) throw new BadRequestException(["password"]);
+
+            if(!UserDAO::isUserAccountConfirmed($userUid)) throw new UserNotVerifiedException();
+
             $user = UserDAO::read($userUid);
 
             GenericDAO::disconnect();
@@ -267,6 +271,9 @@ class Users {
             } else {
                 throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
             }
+        } catch(NotFoundException|BadRequestException|UserNotVerifiedException $ex) {
+            GenericDAO::disconnect();
+            throw $ex;
         } catch (Exception $ex) {
             throw new ServerException(
                message: $ex->getMessage(),
