@@ -38,7 +38,16 @@ class ServerException extends BaseApiException {
 
     public function toLog(): string {
         $time = date("H:i d/m/Y", time());
-        $trace = implode("\n", $this->trace);
+
+        $trace = implode("\n", array_map(function ($entry) {
+            // Only handle arrays, convert others directly to strings
+            if (is_array($entry)) {
+                return implode(", ", $entry); // Join array elements into one string
+            } else {
+                return (string) $entry; // Convert scalar values to strings
+            }
+        }, $this->trace));
+
         return "[ERROR] Server Error happened at {$time}\n[EXCEPTION] {$this->message}\n[TRACE] {$trace}";
     }
 }
