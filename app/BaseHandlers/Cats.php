@@ -290,7 +290,7 @@ class Cats {
             RedisDb::connect();
             GenericDAO::connect();
 
-            $authenticatedUser = RedisDb::validateUserToken($bearerToken, $uriParts[1]);
+            $authenticatedUser = RedisDb::validateUserToken($bearerToken);
 
             if (UserDAO::read($authenticatedUser) == null) throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
             if (!UserDAO::isUserAccountConfirmed($authenticatedUser)) throw new UserNotVerifiedException();
