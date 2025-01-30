@@ -464,12 +464,16 @@ class Users {
             RedisDb::connect();
             GenericDAO::connect();
 
-            RedisDb::validateUserToken($bearerToken, $uriParts[1]);
+            $authenticatedUserUid = RedisDb::validateUserToken($bearerToken, $uriParts[1]);
 
             if(UserDAO::read($uriParts[1] == null)) throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
             if(!UserDAO::isUserAccountConfirmed($uriParts[1])) throw new UserNotVerifiedException();
 
             $user = UserDAO::read($uriParts[1]);
+
+            if(strcmp(Uid::compact($authenticatedUserUid), Uid::compact($user->getUid())) != 0) {
+                throw new UnauthorizedException(UnauthorizedReason::NOT_ALLOWED);
+            }
 
             if (array_key_exists('description', $json)) {
                 $user->setDescription($json['description']);
@@ -482,10 +486,6 @@ class Users {
             }
             if (array_key_exists('image_mime', $json)) {
                 $user->setImageMimeType($json['image_mime']);
-            }
-
-            if(strcmp(Uid::compact($uriParts[1]), Uid::compact($user->getUid())) != 0) {
-                throw new UnauthorizedException(UnauthorizedReason::NOT_ALLOWED);
             }
 
             UserDAO::update($user);
@@ -521,11 +521,11 @@ class Users {
 
             if(!UserDAO::doesUserExist($uriParts[1])) throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
 
-            RedisDb::validateUserToken($bearerToken, $uriParts[1]);
+            $authenticatedUserUid = RedisDb::validateUserToken($bearerToken, $uriParts[1]);
 
             $user = UserDAO::read($uriParts[1]);
 
-            if(strcmp(Uid::compact($uriParts[1]), Uid::compact($user->getUid())) != 0) {
+            if(strcmp(Uid::compact($authenticatedUserUid), Uid::compact($user->getUid())) != 0) {
                 throw new UnauthorizedException(UnauthorizedReason::NOT_ALLOWED);
             }
 

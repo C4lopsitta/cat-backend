@@ -49,6 +49,7 @@ class RedisDb {
 
     /**
      * @throws UnauthorizedException
+     * @return string User token
      */
     static public function validateUserToken(string $token, ?string $userUid = null): string {
         if(!self::$instance) {
