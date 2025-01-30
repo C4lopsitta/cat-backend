@@ -40,6 +40,7 @@ JSON;
 
     public function toLog(): string {
         $time = date("H:i d/m/Y", time());
-        return "[ERROR] Server Error happened at {$time}\n[EXCEPTION] {$this->message}\n[TRACE] {$this->trace}";
+        $trace = implode("\n", $this->trace);
+        return "[ERROR] Server Error happened at {$time}\n[EXCEPTION] {$this->message}\n[TRACE] {$trace}";
     }
 }

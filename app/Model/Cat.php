@@ -30,20 +30,20 @@ class Cat {
     private ?string $ownerUID;
 
     /**
-     * @param string $uid
      * @param string $name
      * @param int $age
-     * @param string $description
-     * @param string $whenLastSeen
-     * @param string $whereLastSeen
+     * @param string|null $description
+     * @param string|null $whenLastSeen
+     * @param string|null $whereLastSeen
      * @param string|null $race
      * @param string|null $furColor
-     * @param int $weight
+     * @param int|null $weight
      * @param bool $isStray
      * @param string|null $image
      * @param string|null $imageMimeType
      * @param int|null $price
      * @param string|null $ownerUID
+     * @param string|null $uid
      */
     public function __construct(string $name, int $age, ?string $description, ?string $whenLastSeen, ?string $whereLastSeen, ?string $race, ?string $furColor, ?int $weight, bool $isStray, ?string $image, ?string $imageMimeType, ?int $price, ?string $ownerUID, ?string $uid = null) {
         $this->uid = $uid;
