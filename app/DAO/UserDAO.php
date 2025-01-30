@@ -119,7 +119,7 @@ class UserDAO extends GenericDAO {
      */
     public static function doesUserExist(string $email): bool {
         $stmt = self::prepareAndExecute(self::SQL_CHECK_USER_EXISTS, ['email' => $email]);
-        return (bool)$stmt->fetch(PDO::FETCH_OBJ);
+        return $stmt->fetch(PDO::FETCH_OBJ) != null || $stmt->rowCount() > 0;
     }
 
     /**

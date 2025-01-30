@@ -244,7 +244,7 @@ class Users {
             RedisDb::connect();
 
             if (!UserDAO::doesUserExist($json['email'])) {
-                throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
+                error_log("User not found: " . $json['email']);
             }
 
             $userUid = UserDAO::fetchUserUidFromEmail($json['email']);
@@ -484,6 +484,10 @@ class Users {
                 $user->setImageMimeType($json['image_mime']);
             }
 
+            if(strcmp(Uid::compact($uriParts[1]), Uid::compact($user->getUid())) != 0) {
+                throw new UnauthorizedException(UnauthorizedReason::NOT_ALLOWED);
+            }
+
             UserDAO::update($user);
             GenericDAO::disconnect();
         } catch (UnauthorizedException|UserNotVerifiedException|NotFoundException $ex) { throw $ex; } catch (Exception $ex) {
@@ -518,6 +522,12 @@ class Users {
             if(!UserDAO::doesUserExist($uriParts[1])) throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
 
             RedisDb::validateUserToken($bearerToken, $uriParts[1]);
+
+            $user = UserDAO::read($uriParts[1]);
+
+            if(strcmp(Uid::compact($uriParts[1]), Uid::compact($user->getUid())) != 0) {
+                throw new UnauthorizedException(UnauthorizedReason::NOT_ALLOWED);
+            }
 
             UserDAO::delete($uriParts[1]);
             GenericDAO::disconnect();
