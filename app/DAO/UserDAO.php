@@ -35,6 +35,7 @@ class UserDAO extends GenericDAO {
     private const SQL_CHECK_ACCOUNT_CONFIRMED = "SELECT * FROM users WHERE users.uid = :uid AND isAccountConfirmed = true;";
     private const SQL_FETCH_UID_FROM_EMAIL = "SELECT uid FROM users WHERE email= :email;";
     private const SQL_CHECK_USER_EXISTS = "SELECT * FROM users WHERE email LIKE :email;";
+    private const SQL_CHECK_USER_EXISTS_UID = "SELECT * FROM users WHERE uid LIKE :uid;";
     private const SQL_READ_ALL_CONFIRMED_USERS = "SELECT * FROM users WHERE isAccountConfirmed = true;";
     private const SQL_UPDATE_USER = "UPDATE users SET
                 username = :username,
@@ -119,6 +120,12 @@ class UserDAO extends GenericDAO {
      */
     public static function doesUserExist(string $email): bool {
         $stmt = self::prepareAndExecute(self::SQL_CHECK_USER_EXISTS, ['email' => $email]);
+        return $stmt->fetch(PDO::FETCH_OBJ) != null || $stmt->rowCount() > 0;
+    }
+
+    public static function doesUserExistByUid(string $uid): bool {
+        $uid = Uid::compact($uid);
+        $stmt = self::prepareAndExecute(self::SQL_CHECK_USER_EXISTS_UID, ['uid' => $uid]);
         return $stmt->fetch(PDO::FETCH_OBJ) != null || $stmt->rowCount() > 0;
     }
 

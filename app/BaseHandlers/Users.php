@@ -11,6 +11,7 @@
 
 namespace BaseHandlers;
 
+use DAO\CartItemDAO;
 use DAO\CatDAO;
 use DAO\GenericDAO;
 use DAO\RedisDb;
@@ -70,39 +71,6 @@ class Users {
                 default => throw new NotFoundException(),
             };
         } else throw new NotFoundException();
-    }
-
-    /**
-     * Returns a JSON formatted list of users when a GET request is made
-     * @throws ServerException
-     * @throws MethodNotAllowedException
-     */
-    private static function listAllUsers(): string {
-        if($_SERVER['REQUEST_METHOD'] != 'GET') {
-            throw new MethodNotAllowedException($_SERVER['REQUEST_METHOD']);
-        }
-
-        $page = $_GET['page'] ?? null;
-        $itemsPerPage = $_GET['items'] ?? 25;
-
-        try {
-            GenericDAO::connect();
-            $users = UserDAO::readAll();
-            GenericDAO::disconnect();
-        } catch (Exception $ex) {
-            throw new ServerException(
-               message: $ex->getMessage(),
-               trace: $ex->getTrace(),
-               thrownIn: "\BaseHandlers\Users::listAllUsers()"
-            );
-        }
-
-        $usersJsons = [];
-        foreach($users as $user) {
-            $usersJsons[] = $user->toCompactJson();
-        }
-
-        return json_encode($usersJsons);
     }
 
     /**
@@ -284,41 +252,7 @@ class Users {
         }
     }
 
-    /**
-     * Handles operations related to a UID-based URI path.
-     *
-     * @param array $uriParts The parts of the URI path. The second element is expected
-     *                        to be a valid UID, and optionally the third element may indicate
-     *                        a specific operation (e.g., "validate").
-     * @return string A result from the corresponding operation, such as validation, fetching,
-     *                updating, or deleting a user.
-     * @throws NotFoundException If the UID is invalid or if the specified path does not exist.
-     * @throws MethodNotAllowedException If the HTTP request method is not supported for the operation.
-     * @throws ServerException When a critical server error happens
-     * @throws BadRequestException When a badly formatted request is made
-     * @throws UserNotVerifiedException When the user account is not verified
-     * @throws UnauthorizedException When a request is made to an authenticated endpoint without proper authentication
-     */
-    private static function handleUidURI(array $uriParts): string {
-        if (!Uid::verify($uriParts[1])) {
-            throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
-        } elseif (Uid::verify($uriParts[1])) {
-            if (sizeof($uriParts) == 3) {
-                if ($uriParts[2] == "validate") {
-                    return self::validateAccount($uriParts);
-                }
-            } else {
-                $requestMethod = $_SERVER['REQUEST_METHOD'];
-                return match ($requestMethod) {
-                    'GET' => self::getUser($uriParts),
-                    'PUT' => self::updateUser($uriParts),
-                    'DELETE' => self::deleteUser($uriParts),
-                    default => throw new MethodNotAllowedException($requestMethod)
-                };
-            }
-        }
-        throw new NotFoundException(NotFoundReason::PATH_NOT_FOUND);
-    }
+
 
     /**
      * Validates an account by confirming the provided confirmation ID and user UID.
@@ -349,7 +283,7 @@ class Users {
         try {
             RedisDb::connect();
             GenericDAO::connect();
-            if(!UserDAO::doesUserExist($userUid)) throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
+            if(!UserDAO::doesUserExistByUid($userUid)) throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
         } catch (NotFoundException $ex) { throw $ex; } catch (Exception $ex) {
             GenericDAO::disconnect();
             throw new ServerException(
@@ -407,7 +341,86 @@ class Users {
     }
     // endregion userRegistration
 
-    // region userRUD
+    // region userReadUpdateDelete
+    /**
+     * Handles operations related to a UID-based URI path.
+     *
+     * @param array $uriParts The parts of the URI path. The second element is expected
+     *                        to be a valid UID, and optionally the third element may indicate
+     *                        a specific operation (e.g., "validate").
+     * @return string A result from the corresponding operation, such as validation, fetching,
+     *                updating, or deleting a user.
+     * @throws NotFoundException If the UID is invalid or if the specified path does not exist.
+     * @throws MethodNotAllowedException If the HTTP request method is not supported for the operation.
+     * @throws ServerException When a critical server error happens
+     * @throws BadRequestException When a badly formatted request is made
+     * @throws UserNotVerifiedException When the user account is not verified
+     * @throws UnauthorizedException When a request is made to an authenticated endpoint without proper authentication
+     */
+    private static function handleUidURI(array $uriParts): string {
+        if (!Uid::verify($uriParts[1])) {
+            throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
+        } elseif (Uid::verify($uriParts[1])) {
+            if (sizeof($uriParts) == 3) {
+                if ($uriParts[2] == "validate") {
+                    return self::validateAccount($uriParts);
+                }
+                if ($uriParts[2] == "cart") {
+                    $requestMethod = $_SERVER['REQUEST_METHOD'];
+                    return match ($requestMethod) {
+                        'GET' => self::getUserCart($uriParts),
+                        'POST' => self::checkoutCart($uriParts),
+                        'PUT' => self::updateUserCart($uriParts),
+                        'DELETE' => self::deleteUserCart($uriParts),
+                        default => throw new MethodNotAllowedException($requestMethod)
+                    };
+                }
+            } else {
+                $requestMethod = $_SERVER['REQUEST_METHOD'];
+                return match ($requestMethod) {
+                    'GET' => self::getUser($uriParts),
+                    'PUT' => self::updateUser($uriParts),
+                    'DELETE' => self::deleteUser($uriParts),
+                    default => throw new MethodNotAllowedException($requestMethod)
+                };
+            }
+        }
+        throw new NotFoundException(NotFoundReason::PATH_NOT_FOUND);
+    }
+
+    /**
+     * Returns a JSON formatted list of users when a GET request is made
+     * @throws ServerException
+     * @throws MethodNotAllowedException
+     */
+    private static function listAllUsers(): string {
+        if($_SERVER['REQUEST_METHOD'] != 'GET') {
+            throw new MethodNotAllowedException($_SERVER['REQUEST_METHOD']);
+        }
+
+        $page = $_GET['page'] ?? null;
+        $itemsPerPage = $_GET['items'] ?? 25;
+
+        try {
+            GenericDAO::connect();
+            $users = UserDAO::readAll();
+            GenericDAO::disconnect();
+        } catch (Exception $ex) {
+            throw new ServerException(
+               message: $ex->getMessage(),
+               trace: $ex->getTrace(),
+               thrownIn: "\BaseHandlers\Users::listAllUsers()"
+            );
+        }
+
+        $usersJsons = [];
+        foreach($users as $user) {
+            $usersJsons[] = $user->toCompactJson();
+        }
+
+        return json_encode($usersJsons);
+    }
+
     /**
      * Retrieves a user based on the provided URI parts.
      *
@@ -542,5 +555,80 @@ class Users {
         }
         return '{"success": true}';
     }
-    // endregion userRUD
+    // endregion userReadUpdateDelete
+
+    // region userCart
+
+    /**
+     * @throws NotFoundException
+     * @throws UnauthorizedException
+     * @throws UserNotVerifiedException
+     * @throws ServerException
+     */
+    private static function verifyAuthAndOwnershipAndRunFunction(array $uriParts, callable $function): string {
+        try {
+            $bearerToken = Token::getTokenFromHeader();
+            RedisDb::connect();
+            GenericDAO::connect();
+
+            $authenticatedUserUid = RedisDb::validateUserToken($bearerToken);
+
+            $user = UserDAO::read($authenticatedUserUid);
+
+            if($user == null) throw new NotFoundException(NotFoundReason::USER_NOT_FOUND);
+            if(strcmp(Uid::compact($authenticatedUserUid), Uid::compact($user->getUid())) != 0) throw new UnauthorizedException(UnauthorizedReason::NOT_ALLOWED);
+            if(!UserDAO::isUserAccountConfirmed($authenticatedUserUid)) throw new UserNotVerifiedException();
+
+            $result = $function($user);
+            GenericDAO::disconnect();
+            return $result;
+        } catch (NotFoundException|UnauthorizedException|UserNotVerifiedException $ex) {
+            GenericDAO::disconnect();
+            throw $ex;
+        } catch (Exception $ex) {
+            GenericDAO::disconnect();
+            throw new ServerException(
+               message: $ex->getMessage(),
+               code: $ex->getCode(),
+               trace: $ex->getTrace(),
+               thrownIn: "\BaseHandlers\Users::getUserCart()"
+            );
+        }
+    }
+
+    /**
+     * @throws NotFoundException
+     * @throws ServerException
+     * @throws UnauthorizedException
+     * @throws UserNotVerifiedException
+     */
+    private static function getUserCart(array $uriParts): string {
+        return self::verifyAuthAndOwnershipAndRunFunction($uriParts, function($user) {
+            $cartData = [];
+
+            if(isset($_GET['fullData'])) {
+                $tempCartData = CartItemDAO::getUserCart($user->getUid());
+                foreach($tempCartData as $cartItem) {
+                    $cartData[] = $cartItem->toJson();
+                }
+            } else {
+                $cartData = CartItemDAO::getUserCartAsUIDs($user->getUid());
+            }
+
+            return json_encode($cartData);
+        });
+    }
+
+    private static function checkoutCart(array $uriParts): string {
+
+    }
+
+    private static function updateUserCart(array $uriParts): string {
+
+    }
+
+    private static function deleteUserCart(array $uriParts): string {
+
+    }
+    // endregion userCart
 }

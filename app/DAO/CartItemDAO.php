@@ -12,21 +12,18 @@
 namespace DAO;
 
 use Model\Cat;
-use DAO\GenericDAO;
 use Random\RandomException;
 use Utilities\Uid;
 
 use PDO;
 use Exception;
 
-class CartItemDAO extends GenericDAO
-{
+class CartItemDAO extends GenericDAO {
 
     /**
      * @throws RandomException
      */
-    public static function create(object $object): ?object
-    {
+    public static function create(object $object): ?object {
         $sql = "INSERT INTO cartItems(uid, owner, cat)
                         VALUES (:id, :owner, :cat)";
 
@@ -44,35 +41,36 @@ class CartItemDAO extends GenericDAO
         return $object;
     }
 
-    /**
-     * @throws Exception
-     */
-    public static function read(string $id): ?object
-    {
-        throw new Exception('Not implemented');
+    public static function getUserCartAsUIDs(string $uid): array {
+        $uid = Uid::compact($uid);
+
+        $sql = "SELECT cats.uid FROM cartItems, cats WHERE cartItems.owner = :idOwner AND cartItems.cat = cats.uid;";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([':idOwner' => $uid]);
+        $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        $catUids = array();
+        foreach ($results as $result) {
+            $catUids[] = Uid::format($result->uid);
+        }
+
+        return $catUids;
     }
 
-    /**
-     * @throws Exception
-     */
-    public static function readAll(): ?array
-    {
-        throw new Exception('Not implemented');
-    }
 
-    public static function readAllCartItems(): ?array
-    {
-        $sql = "SELECT cats.* FROM cartItems, cats
-                        WHERE cats.uid = cartItems.cat;";
+    public static function getUserCart(string $uid): array {
+        $uid = Uid::compact($uid);
 
-        $resultSet = self::$pdo->query($sql);
-        $results = $resultSet->fetchAll();
+        $sql = "SELECT cats.* FROM cartItems, cats WHERE cartItems.owner = :idOwner AND cartItems.cat = cats.uid;";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([':idOwner' => $uid]);
+        $results = $stmt->fetchAll(PDO::FETCH_OBJ);
 
         $cats = array();
         foreach ($results as $result) {
-            $cats[] = new Cat($result["name"], $result["age"], $result["description"], $result["whenLastSeen"],
-                $result["whereLastSeen"], $result["race"], $result["furColor"], $result["weight"], $result["isStray"], $result["image"], $result["imageMimeType"],
-                $result["price"], $result["owner"], $result["uid"]);
+            $cats[] = new Cat($result->name, $result->age, $result->description, $result->whenLastSeen,
+                $result->whereLastSeen, $result->race, $result->furColor, $result->weight, $result->isStray, $result->image, $result->imageMimeType,
+                $result->price, $result->owner, $result->uid);
         }
 
         return $cats;
@@ -81,13 +79,25 @@ class CartItemDAO extends GenericDAO
     /**
      * @throws Exception
      */
-    public static function update(object $object): bool
-    {
+    public static function read(string $id): ?object {
         throw new Exception('Not implemented');
     }
 
-    public static function delete(string $id): bool
-    {
+    /**
+     * @throws Exception
+     */
+    public static function readAll(): ?array {
+        throw new Exception('Not implemented');
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function update(object $object): bool {
+        throw new Exception('Not implemented');
+    }
+
+    public static function delete(string $id): bool {
         $sql = "DELETE FROM cartItems 
                         WHERE cartItems.uid = :id;";
 
